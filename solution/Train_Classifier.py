@@ -20,12 +20,12 @@ import pickle
     
 # Read in cars and notcars
 cars = []
-images = glob.glob('./../training_data/vehicles**/*.jpg', recursive=True)
+images = glob.glob('./../../training_data/vehicles**/*.jpg', recursive=True)
 for image in images:
     cars.append(image)
 
 notcars = []
-images = glob.glob('./../training_data/non-vehicles**/*.jpg', recursive=True)
+images = glob.glob('./../../training_data/non-vehicles**/*.jpg', recursive=True)
 for image in images:
     notcars.append(image)
 

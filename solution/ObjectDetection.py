@@ -113,7 +113,8 @@ def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, ce
     return find_rectangles
 
 frames = []
-images = glob.glob('./../video_test_data/*.jpg', recursive=True)
+#images = glob.glob('./../video_test_data/*.jpg', recursive=True)
+images = glob.glob('./../../Project_Video/*.jpg', recursive=True)
 
 ystart = 400
 ystop = 600
@@ -122,13 +123,6 @@ counter = 0
 
 result_list = []
 vehicle_boxes = []
-
-
-def append_boxes(a,b):
-    for i in range(0,len(b),1):
-        a.append([b[i][0], b[i][1]])
-
-    return a
 
 
 for image in images:
@@ -219,10 +213,8 @@ for image in images:
     # #################################
 
 
-    plt.imshow(out_img)
-    plt.show()
- 
-
+    #plt.imshow(out_img)
+    #plt.show()
     #exit()
 
 
@@ -240,16 +232,17 @@ for image in images:
 
     draw_img = draw_labeled_bboxes(np.copy(img), labels)
 
-    fig = plt.figure()
-    plt.subplot(121)
-    plt.imshow(draw_img)
-    plt.title('Car Positions')
-    plt.subplot(122)
-    plt.imshow(heatmap, cmap='hot')
-    plt.title('Heat Map')
-    fig.tight_layout()
-    plt.show()
-    #cv2.imwrite('./../output/img_' + str(counter) + '.jpg', draw_img)
+    #fig = plt.figure()
+    #plt.subplot(121)
+    #plt.imshow(draw_img)
+    #plt.title('Car Positions')
+    #plt.subplot(122)
+    #plt.imshow(heatmap, cmap='hot')
+    #plt.title('Heat Map')
+    #fig.tight_layout()
+    #plt.show()
+
+    cv2.imwrite('./../output/img_' + str(counter) + '.jpg', draw_img)
     #plt.savefig('./output/img_' + str(counter) + '.jpg')
 
 

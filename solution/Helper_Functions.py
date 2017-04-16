@@ -3,6 +3,9 @@ import numpy as np
 import cv2
 from skimage.feature import hog
 
+
+
+
 def convert_color(img, conv='RGB2YCrCb'):
     if conv == 'RGB2YCrCb':
         return cv2.cvtColor(img, cv2.COLOR_RGB2YCrCb)
@@ -147,6 +150,15 @@ def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
             window_list.append(((startx, starty), (endx, endy)))
     # Return the list of windows
     return window_list
+
+
+def append_boxes(a,b):
+    for i in range(0,len(b),1):
+        a.append([b[i][0], b[i][1]])
+
+    return a
+
+    
 
 # Define a function to draw bounding boxes
 def draw_boxes(img, bboxes, color=(0, 0, 255), thick=6):
