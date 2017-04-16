@@ -127,8 +127,8 @@ vehicle_boxes = []
 for image in images:
     counter+=1
 
-    #if counter%10!=0:
-    #    continue
+    if counter%10!=0:
+        continue
     #if counter>10:
     #    exit()
     vehicle_boxes = []
@@ -169,6 +169,18 @@ for image in images:
     temp_vehicle_boxes = []
     draw_color = (0,0,255) 
     scale = 0.8
+    result_list = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell,
+                       cell_per_block, spatial_size, hist_bins)
+
+    temp_vehicle_boxes = append_boxes(temp_vehicle_boxes,result_list)
+    out_img = draw_boxes(out_img, temp_vehicle_boxes, color=draw_color, thick=6)
+    vehicle_boxes = append_boxes(vehicle_boxes , temp_vehicle_boxes)
+    # #################################
+
+    # #################################
+    temp_vehicle_boxes = []
+    draw_color = (0,0,255) 
+    scale = 0.6
     result_list = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell,
                        cell_per_block, spatial_size, hist_bins)
 
@@ -224,7 +236,7 @@ for image in images:
 
     # Visualize the heatmap when displaying
     heatmap = np.clip(heat, 0, 255)
-    heatmap = apply_threshold(heatmap, 10)
+    heatmap = apply_threshold(heatmap, 12)
 
     # Find final boxes from heatmap using label function
 
