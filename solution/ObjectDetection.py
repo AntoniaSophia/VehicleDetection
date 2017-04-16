@@ -18,9 +18,6 @@ cell_per_block = dist_pickle["cell_per_block"]
 spatial_size = dist_pickle["spatial_size"]
 hist_bins = dist_pickle["hist_bins"]
 
-#img = mpimg.imread('./examples/test6.jpg')
-#img = mpimg.imread('./examples/test7.jpg')
-#img = mpimg.imread('./examples/bbox-example-image.jpg')
 
 # Define a single function that can extract features using hog
 # sub-sampling and make predictions
@@ -28,8 +25,10 @@ hist_bins = dist_pickle["hist_bins"]
 
 def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins):
     find_rectangles = []
+
+    #img = img.astype(np.float32)/255    
     draw_img = np.copy(img)
-    img = img.astype(np.float32)/255
+
 
     img_tosearch = img[ystart:ystop, :, :]
     ctrans_tosearch = convert_color(img_tosearch, conv='RGB2YCrCb')
@@ -136,6 +135,8 @@ for image in images:
     temp_vehicle_boxes = []
 
     img = mpimg.imread(image)
+    #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     #################################
     temp_vehicle_boxes = []
@@ -242,7 +243,7 @@ for image in images:
     #fig.tight_layout()
     #plt.show()
 
-    cv2.imwrite('./../output/img_' + str(counter) + '.jpg', draw_img)
+    mpimg.imsave('./../output/img_' + str(counter) + '.png', draw_img)
     #plt.savefig('./output/img_' + str(counter) + '.jpg')
 
 
