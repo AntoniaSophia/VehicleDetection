@@ -4,6 +4,7 @@ import numpy as np
 import pickle
 import cv2
 from Helper_Functions import *
+from Object import *
 import glob
 import itertools
 from scipy.ndimage.measurements import label
@@ -94,7 +95,11 @@ def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, ce
             spatial_features = bin_spatial(subimg, size=spatial_size)
             hist_features = color_hist(subimg, nbins=hist_bins)
 
+            #print(spatial_features.shape)
+            #print(hist_features.shape) 
+            #print(hog_features.shape) 
             # Scale features and make a prediction
+
             test_features = X_scaler.transform(
                 np.hstack((spatial_features, hist_features, hog_features)).reshape(1, -1))
             #test_features = X_scaler.transform(np.hstack((shape_feat, hist_feat)).reshape(1, -1))
@@ -112,31 +117,37 @@ def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, ce
     return find_rectangles
 
 frames = []
+
 #images = glob.glob('./../video_test_data/*.jpg', recursive=True)
 images = glob.glob('./../../Project_Video/*.jpg', recursive=True)
 
-ystart = 400
-ystop = 600
+
 
 counter = 0
 
 result_list = []
 vehicle_boxes = []
-
+objectsDetected = []
 
 for image in images:
     counter+=1
 
-    if counter%10!=0:
+    if counter%5!=0:
         continue
-    #if counter>10:
+    
+    if counter<140:
+       continue
     #    exit()
+
     vehicle_boxes = []
     temp_vehicle_boxes = []
 
     img = mpimg.imread(image)
     #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    ystart = 380
+    ystop = 600
 
     #################################
     temp_vehicle_boxes = []
@@ -156,31 +167,6 @@ for image in images:
     temp_vehicle_boxes = []
     draw_color = (0,255,0) 
     scale = 1.3
-    result_list = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell,
-                       cell_per_block, spatial_size, hist_bins)
-
-    temp_vehicle_boxes = append_boxes(temp_vehicle_boxes,result_list)
-    out_img = draw_boxes(out_img, temp_vehicle_boxes, color=draw_color, thick=6)
-    vehicle_boxes = append_boxes(vehicle_boxes , temp_vehicle_boxes)
-    # #################################
-
-
-    # #################################
-    temp_vehicle_boxes = []
-    draw_color = (0,0,255) 
-    scale = 0.8
-    result_list = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell,
-                       cell_per_block, spatial_size, hist_bins)
-
-    temp_vehicle_boxes = append_boxes(temp_vehicle_boxes,result_list)
-    out_img = draw_boxes(out_img, temp_vehicle_boxes, color=draw_color, thick=6)
-    vehicle_boxes = append_boxes(vehicle_boxes , temp_vehicle_boxes)
-    # #################################
-
-    # #################################
-    temp_vehicle_boxes = []
-    draw_color = (0,0,255) 
-    scale = 0.6
     result_list = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell,
                        cell_per_block, spatial_size, hist_bins)
 
@@ -226,6 +212,48 @@ for image in images:
     # #################################
 
 
+    # ystart = 360
+    # ystop = 450
+
+    # #################################
+    temp_vehicle_boxes = []
+    draw_color = (0,0,255) 
+    scale = 0.8
+    result_list = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell,
+                       cell_per_block, spatial_size, hist_bins)
+
+    temp_vehicle_boxes = append_boxes(temp_vehicle_boxes,result_list)
+    out_img = draw_boxes(out_img, temp_vehicle_boxes, color=draw_color, thick=6)
+    vehicle_boxes = append_boxes(vehicle_boxes , temp_vehicle_boxes)
+    # #################################
+
+    # #################################
+    temp_vehicle_boxes = []
+    draw_color = (0,0,255) 
+    scale = 0.6
+    result_list = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell,
+                       cell_per_block, spatial_size, hist_bins)
+
+    temp_vehicle_boxes = append_boxes(temp_vehicle_boxes,result_list)
+    out_img = draw_boxes(out_img, temp_vehicle_boxes, color=draw_color, thick=6)
+    vehicle_boxes = append_boxes(vehicle_boxes , temp_vehicle_boxes)
+    # #################################
+
+    # #################################
+    temp_vehicle_boxes = []
+    draw_color = (0,0,255) 
+    scale = 0.4
+    result_list = find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell,
+                       cell_per_block, spatial_size, hist_bins)
+
+    temp_vehicle_boxes = append_boxes(temp_vehicle_boxes,result_list)
+    out_img = draw_boxes(out_img, temp_vehicle_boxes, color=draw_color, thick=6)
+    vehicle_boxes = append_boxes(vehicle_boxes , temp_vehicle_boxes)
+    # #################################
+
+
+
+
     #plt.imshow(out_img)
     #plt.show()
     #exit()
@@ -236,14 +264,58 @@ for image in images:
 
     # Visualize the heatmap when displaying
     heatmap = np.clip(heat, 0, 255)
-    heatmap = apply_threshold(heatmap, 12)
+    heatmap = apply_threshold(heatmap, 10)
 
     # Find final boxes from heatmap using label function
 
     labels = label(heatmap)
     print(labels[1], 'cars found')
 
-    draw_img = draw_labeled_bboxes(np.copy(img), labels)
+
+
+    foundObjects = create_Objects_from_Labels(labels,counter)
+
+    for object_number in range(0, len(foundObjects)):
+        img_temp = np.copy(img)
+        img_tosearch = img_temp[foundObjects[object_number].left_upper_y:foundObjects[object_number].right_lower_y,foundObjects[object_number].left_upper_x:foundObjects[object_number].right_lower_x,:]
+        subimg = cv2.resize(img_tosearch[:,:], (64, 64))
+        #subimg = np.copy(img)
+
+        ttt_features = extract_features_img(subimg, color_space='YCrCb', 
+            spatial_size=spatial_size, hist_bins=hist_bins, 
+            orient=orient, pix_per_cell=pix_per_cell, 
+            cell_per_block=cell_per_block, 
+            hog_channel='ALL', spatial_feat=True, 
+            hist_feat=True, hog_feat=True)
+    #    plt.imshow(subimg)
+    #    plt.show()
+        # Get color features
+
+        test_features = X_scaler.transform(ttt_features)
+        test_prediction = svc.predict(test_features)
+
+        if test_prediction > 0:
+            track_object(objectsDetected , foundObjects[object_number])
+
+        #print("gefunden in volume: " , foundObjects[object_number].getVolume() , " : " , test_prediction)
+        
+
+
+
+    print("Length: Temp" , len(foundObjects))
+    print("Length All: " , len(objectsDetected))
+
+    draw_img = draw_objects(np.copy(img), objectsDetected)
+
+    if counter%100 == 0:
+        objectsDetected = cleanup_objects(objectsDetected,counter)
+
+    for object_number in range(0, len(objectsDetected)):
+        objectsDetected[object_number].initNextFrame()
+        # missing: when to remove an object completely!!!
+
+
+    #draw_img = draw_labeled_bboxes(np.copy(img), labels)
 
     #fig = plt.figure()
     #plt.subplot(121)

@@ -3,7 +3,8 @@ import numpy as np
 import cv2
 from skimage.feature import hog
 
-
+import matplotlib.pyplot as plt
+from Object import *
 
 
 def convert_color(img, conv='RGB2YCrCb'):
@@ -105,6 +106,54 @@ def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
         features.append(np.concatenate(file_features))
     # Return list of feature vectors
     return features
+
+# Define a function to extract features from a list of images
+# Have this function call bin_spatial() and color_hist()
+def extract_features_img(image, color_space='RGB', spatial_size=(32, 32),
+                        hist_bins=32, orient=9, 
+                        pix_per_cell=8, cell_per_block=2, hog_channel=0,
+                        spatial_feat=True, hist_feat=True, hog_feat=True):
+    # Create a list to append feature vectors to
+    features = []
+    file_features = []
+    # Iterate through the list of images
+    if color_space != 'RGB':
+        if color_space == 'HSV':
+            feature_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+        elif color_space == 'LUV':
+            feature_image = cv2.cvtColor(image, cv2.COLOR_RGB2LUV)
+        elif color_space == 'HLS':
+            feature_image = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
+        elif color_space == 'YUV':
+            feature_image = cv2.cvtColor(image, cv2.COLOR_RGB2YUV)
+        elif color_space == 'YCrCb':
+            feature_image = cv2.cvtColor(image, cv2.COLOR_RGB2YCrCb)
+    else: feature_image = np.copy(image)      
+
+    if spatial_feat == True:
+        spatial_features = bin_spatial(feature_image, size=spatial_size)
+        file_features.append(spatial_features)
+    if hist_feat == True:
+        # Apply color_hist()
+        hist_features = color_hist(feature_image, nbins=hist_bins)
+        file_features.append(hist_features)
+    if hog_feat == True:
+    # Call get_hog_features() with vis=False, feature_vec=True
+        if hog_channel == 'ALL':
+            hog_features = []
+            for channel in range(feature_image.shape[2]):
+                hog_features.append(get_hog_features(feature_image[:,:,channel], 
+                                    orient, pix_per_cell, cell_per_block, 
+                                    vis=False, feature_vec=True))
+            hog_features = np.ravel(hog_features)        
+        else:
+            hog_features = get_hog_features(feature_image[:,:,hog_channel], orient, 
+                        pix_per_cell, cell_per_block, vis=False, feature_vec=True)
+        # Append the new feature vector to the features list
+        file_features.append(hog_features)
+    features.append(np.concatenate(file_features))
+    # Return list of feature vectors
+    return features    
     
 # Define a function that takes an image,
 # start and stop positions in both x and y, 
@@ -187,6 +236,76 @@ def draw_labeled_bboxes(img, labels):
         cv2.rectangle(img, bbox[0], bbox[1], (0, 0, 255), 6)
     # Return the image
     return img
+
+
+def draw_objects(img, objects):
+    # Iterate through all detected cars
+    for object_number in range(0, len(objects)):
+        # Find pixels with each car_number label value
+        bbox = ((objects[object_number].left_upper_x, objects[object_number].left_upper_y),
+                (objects[object_number].right_lower_x, objects[object_number].right_lower_y))
+        # Draw the box on the image
+        if objects[object_number].detected == True or objects[object_number].gracePeriod == True:
+            cv2.rectangle(img, bbox[0], bbox[1], (0, 0, 255), 6)
+
+    # Return the image
+
+    return img
+
+
+def create_Objects_from_Labels(labels,counter):
+    # Iterate through all detected cars
+    objectsFound = []
+
+    for car_number in range(1, labels[1]+1):
+        # Find pixels with each car_number label value
+        nonzero = (labels[0] == car_number).nonzero()
+        # Identify x and y values of those pixels
+        nonzeroy = np.array(nonzero[0])
+        nonzerox = np.array(nonzero[1])
+        # Define a bounding box based on min/max x and y
+        bbox = ((np.min(nonzerox), np.min(nonzeroy)),
+                (np.max(nonzerox), np.max(nonzeroy)))
+    
+        newObject = Object(counter, car_number)
+        newObject.setLocation(np.min(nonzeroy), np.min(nonzerox), np.max(nonzeroy), np.max(nonzerox))
+
+        if newObject.getVolume() > 1000:
+            objectsFound.append(newObject)
+
+    return objectsFound
+
+def track_object(allObjects, newObject):
+    existingObjectFound = False
+
+    for object_number in range(0, len(allObjects)):
+        tempObject = allObjects[object_number]
+
+        overlap = tempObject.getOverlapVolume(newObject)
+        #print("Overlap " , newObject.getInfo() , "  with existing " + tempObject.getInfo() , " : " , overlap)
+        if  overlap > 1000:
+            existingObjectFound = True            
+            tempObject.mergeObject(newObject)
+
+    if existingObjectFound == False:
+        print("Appending object: " , newObject.getInfo())
+        allObjects.append(newObject)
+
+    return allObjects
+
+def cleanup_objects(allObjects,counter):
+    result = []
+    for object_number in range(0, len(allObjects)):
+        tempObject = allObjects[object_number]
+
+        if counter - tempObject.frameCounter > 72:
+            if tempObject.detected == False and tempObject.gracePeriod == False:
+                # remove this object
+                print()
+            else:
+                result.append(tempObject)      
+
+    return result
 
 
 def add_heat(heatmap, bbox_list):
