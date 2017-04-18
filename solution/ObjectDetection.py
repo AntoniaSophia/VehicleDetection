@@ -132,10 +132,10 @@ objectsDetected = []
 for image in images:
     counter+=1
 
-    if counter%5!=0:
-        continue
+    #if counter%5!=0:
+    #    continue
     
-    if counter<140:
+    if counter<1000:
        continue
     #    exit()
 
@@ -293,8 +293,10 @@ for image in images:
 
         test_features = X_scaler.transform(ttt_features)
         test_prediction = svc.predict(test_features)
+        test_confidence = svc.decision_function(test_features)
+        print("Object found with confidence: " , test_confidence)
 
-        if test_prediction > 0:
+        if test_prediction > 0 and test_confidence > 0.5:
             track_object(objectsDetected , foundObjects[object_number])
 
         #print("gefunden in volume: " , foundObjects[object_number].getVolume() , " : " , test_prediction)

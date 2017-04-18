@@ -79,8 +79,9 @@ class Object():
 
         if self.numberOfOccurances > 24:
             self.gracePeriod = True
+            self.numberOfOccurances = 30
 
-        if self.numberOfOccurances >= 4:
+        if self.numberOfOccurances >= 6:
             self.detected = True
 
         return 

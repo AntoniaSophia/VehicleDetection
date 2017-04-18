@@ -298,12 +298,15 @@ def cleanup_objects(allObjects,counter):
     for object_number in range(0, len(allObjects)):
         tempObject = allObjects[object_number]
 
-        if counter - tempObject.frameCounter > 72:
+        if (counter - tempObject.frameCounter) > 72:
             if tempObject.detected == False and tempObject.gracePeriod == False:
                 # remove this object
                 print()
             else:
                 result.append(tempObject)      
+        else:
+            result.append(tempObject)      
+
 
     return result
 
