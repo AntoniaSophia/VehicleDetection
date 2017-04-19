@@ -247,6 +247,7 @@ def draw_objects(img, objects):
                 (objects[object_number].right_lower_x, objects[object_number].right_lower_y))
         # Draw the box on the image
         if objects[object_number].detected == True or objects[object_number].gracePeriod == True:
+        #if True == True:
             #print("Really Drawing: ",objects[object_number].getInfo())
             cv2.rectangle(img, bbox[0], bbox[1], (0, 0, 255), 6)
 

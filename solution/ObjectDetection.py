@@ -51,6 +51,10 @@ class ObjectDetection():
         self.hog_channel = dist_pickle["hog_channel"]
         self.color_space = dist_pickle["color_space"]
 
+    def initNextFrame(self):
+        for object_number in range(0, len(self.objectsDetected)):
+            self.objectsDetected[object_number].initNextFrame()
+
     def track_object(self,allObjects, newObject):
         existingObjectFound = False
 
@@ -184,10 +188,6 @@ class ObjectDetection():
         vehicle_boxes = []
         temp_vehicle_boxes = []
 
-        img = mpimg.imread(image)
-        #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
         ystart = 380
         ystop = 600
 
@@ -308,7 +308,7 @@ class ObjectDetection():
 
 
 
-        foundObjects = create_Objects_from_Labels(labels,counter)
+        foundObjects = create_Objects_from_Labels(labels,frameCounter)
 
         for object_number in range(0, len(foundObjects)):
             img_temp = np.copy(img)
@@ -342,31 +342,30 @@ class ObjectDetection():
             mpimg.imsave('./../output/img_' + str(counter) + '.png', draw_img)
 
 
-        for object_number in range(0, len(self.objectsDetected)):
-            self.objectsDetected[object_number].initNextFrame()
-
 
         return self.objectsDetected
 
 
 #images = glob.glob('./../video_test_data/*.jpg', recursive=True)
-images = glob.glob('./../../Project_Video/*.jpg', recursive=True)
-counter = 0
+#images = glob.glob('./../../Project_Video/*.jpg', recursive=True)
+#counter = 0
 
-objectDet = ObjectDetection("../svm_cal/svc_pickle.p")
+#objectDet = ObjectDetection("../svm_cal/svc_pickle.p")
 
 
 
-for image in images:
-    counter+=1
+#for image in images:
+#    counter+=1
 
     #if counter%5!=0:
     #    continue
     
-    if counter<1000:
-       continue
+#    if counter<1000:
+#       continue
     #    exit()
+    #img = mpimg.imread(image)
 
-    objectDet.processFrame(image,counter,True)
+#    objectDet.processFrame(image,counter,True)
+    #objectDet.initNextFrame()
 
 
