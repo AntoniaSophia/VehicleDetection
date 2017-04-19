@@ -10,6 +10,7 @@ class Object():
         self.objectNumber = number
         self.numberOfOccurances = 0
         self.gracePeriod = False
+        self.detectionThreshold = 6
 
     def setLocation(self,l_upper_y , l_upper_x , r_lower_y, r_lower_x):
         self.left_upper_y = l_upper_y
@@ -39,7 +40,7 @@ class Object():
             self.detected = False
             return False 
 
-        if self.numberOfOccurances < 4:
+        if self.numberOfOccurances < self.detectionThreshold:
             self.detected = False
             return False 
 
@@ -81,9 +82,11 @@ class Object():
             self.gracePeriod = True
             self.numberOfOccurances = 30
 
-        if self.numberOfOccurances >= 6:
+        if self.numberOfOccurances >= self.detectionThreshold:
+            #print("Setting object to detected " ,self.getInfo())  
             self.detected = True
 
+        #print("Number of occurences = " ,self.numberOfOccurances)  
         return 
 
 

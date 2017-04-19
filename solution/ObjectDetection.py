@@ -334,15 +334,17 @@ class ObjectDetection():
         print("Length All: " , len(self.objectsDetected))
 
 
-        if counter%100 == 0:
-            objectsDetected = self.cleanup_objects(self.objectsDetected,counter)
-
-        for object_number in range(0, len(self.objectsDetected)):
-            self.objectsDetected[object_number].initNextFrame()
+        #if counter%100 == 0:
+        #    self.objectsDetected = self.cleanup_objects(self.objectsDetected,counter)
 
         if saveFrame==True:
             draw_img = draw_objects(np.copy(img), self.objectsDetected)
             mpimg.imsave('./../output/img_' + str(counter) + '.png', draw_img)
+
+
+        for object_number in range(0, len(self.objectsDetected)):
+            self.objectsDetected[object_number].initNextFrame()
+
 
         return self.objectsDetected
 

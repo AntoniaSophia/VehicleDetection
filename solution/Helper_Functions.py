@@ -242,10 +242,12 @@ def draw_objects(img, objects):
     # Iterate through all detected cars
     for object_number in range(0, len(objects)):
         # Find pixels with each car_number label value
+        #print("Try drawing: ",objects[object_number].getInfo())
         bbox = ((objects[object_number].left_upper_x, objects[object_number].left_upper_y),
                 (objects[object_number].right_lower_x, objects[object_number].right_lower_y))
         # Draw the box on the image
         if objects[object_number].detected == True or objects[object_number].gracePeriod == True:
+            #print("Really Drawing: ",objects[object_number].getInfo())
             cv2.rectangle(img, bbox[0], bbox[1], (0, 0, 255), 6)
 
     # Return the image
