@@ -275,41 +275,6 @@ def create_Objects_from_Labels(labels,counter):
 
     return objectsFound
 
-def track_object(allObjects, newObject):
-    existingObjectFound = False
-
-    for object_number in range(0, len(allObjects)):
-        tempObject = allObjects[object_number]
-
-        overlap = tempObject.getOverlapVolume(newObject)
-        #print("Overlap " , newObject.getInfo() , "  with existing " + tempObject.getInfo() , " : " , overlap)
-        if  overlap > 1000:
-            existingObjectFound = True            
-            tempObject.mergeObject(newObject)
-
-    if existingObjectFound == False:
-        print("Appending object: " , newObject.getInfo())
-        allObjects.append(newObject)
-
-    return allObjects
-
-def cleanup_objects(allObjects,counter):
-    result = []
-    for object_number in range(0, len(allObjects)):
-        tempObject = allObjects[object_number]
-
-        if (counter - tempObject.frameCounter) > 72:
-            if tempObject.detected == False and tempObject.gracePeriod == False:
-                # remove this object
-                print()
-            else:
-                result.append(tempObject)      
-        else:
-            result.append(tempObject)      
-
-
-    return result
-
 
 def add_heat(heatmap, bbox_list):
     # Iterate through list of bboxes

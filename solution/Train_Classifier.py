@@ -111,8 +111,10 @@ dist_pickle["pix_per_cell"] = pix_per_cell
 dist_pickle["cell_per_block"] = cell_per_block    
 dist_pickle["spatial_size"] = spatial_size
 dist_pickle["hist_bins"] = hist_bins
+dist_pickle["hog_channel"] = hog_channel
+dist_pickle["color_space"] = color_space
 
-pickle.dump( dist_pickle, open( "./svc_pickle.p", "wb" ) )
+pickle.dump( dist_pickle, open( '../svm_cal/svc_pickle.p', "wb" ) )
 
 
 
