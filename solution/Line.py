@@ -936,7 +936,7 @@ def videotest():
         if (toggle == True):
             #print("Toggle activated")
             i = i + 1
-            cv2.imwrite('../temp_images/img_temp_' + str(i) + '.png', frame)
+            #cv2.imwrite('../temp_images/img_temp_' + str(i) + '.png', frame)
             cv2.imwrite('../temp_images_1/img_overlay_' + str(i) + '.png', testFrame.getOverlayImage())
 
         else:
