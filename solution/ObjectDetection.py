@@ -327,7 +327,7 @@ class ObjectDetection():
             test_confidence = self.svc.decision_function(test_features)
             print("Object found with confidence: " , test_confidence)
 
-            if test_prediction > 0 and test_confidence > 0.5:
+            if test_prediction > 0 and test_confidence > 0.4:
                 self.track_object(self.objectsDetected , foundObjects[object_number])
 
         print("Length: Temp" , len(foundObjects))

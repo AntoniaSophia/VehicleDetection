@@ -32,7 +32,7 @@ for image in images:
 
 print(len(cars))
 print(len(notcars))
-#exit()
+exit()
 
 
 ### TODO: Tweak these parameters and see how the results change.

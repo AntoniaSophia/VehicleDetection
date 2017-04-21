@@ -206,20 +206,20 @@ class Line():
                 self.line_base_pos = 900 - self.center_line_point                 
 
 
-        print('-----------------------------------------------------')
-        print('Process ' , len(y_pts) ,  ' points on Line ' , self.orientation)
-        print("Coeff a " ,lane_fit[0])
-        print("Coeff b" ,lane_fit[1])
-        print("Coeff c" ,lane_fit[2])       
-        print("Mean Coeff a" ,mean_coeff[0])
-        print("Mean Coeff b" ,mean_coeff[1])
-        print("Mean Coeff c" ,mean_coeff[2])
-        print("relative_coeff_a_change " ,relative_coeff_a_change)
-        print("relative_coeff_b_change " ,relative_coeff_b_change)
-        print("relative_coeff_c_change " ,relative_coeff_c_change)
-        print("center_line_point " ,self.center_line_point)
-        print("line_base_pos" ,self.line_base_pos)
-        print('-----------------------------------------------------')
+        # print('-----------------------------------------------------')
+        # print('Process ' , len(y_pts) ,  ' points on Line ' , self.orientation)
+        # print("Coeff a " ,lane_fit[0])
+        # print("Coeff b" ,lane_fit[1])
+        # print("Coeff c" ,lane_fit[2])       
+        # print("Mean Coeff a" ,mean_coeff[0])
+        # print("Mean Coeff b" ,mean_coeff[1])
+        # print("Mean Coeff c" ,mean_coeff[2])
+        # print("relative_coeff_a_change " ,relative_coeff_a_change)
+        # print("relative_coeff_b_change " ,relative_coeff_b_change)
+        # print("relative_coeff_c_change " ,relative_coeff_c_change)
+        # print("center_line_point " ,self.center_line_point)
+        # print("line_base_pos" ,self.line_base_pos)
+        # print('-----------------------------------------------------')
 
 
     def calculateCurvature(self):
@@ -612,8 +612,8 @@ class EgoLane():
         else:
             return self.histoCurvatureFit(binary_warped)
 
-        print('left_fit = ', left_fit) 
-        print('right_fit = ', right_fit) 
+        #print('left_fit = ', left_fit) 
+        #print('right_fit = ', right_fit) 
 
         nonzero = binary_warped.nonzero()
         nonzeroy = np.array(nonzero[0])

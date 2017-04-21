@@ -243,14 +243,20 @@ def draw_objects(img, objects):
     for object_number in range(0, len(objects)):
         # Find pixels with each car_number label value
         #print("Try drawing: ",objects[object_number].getInfo())
-        bbox = ((objects[object_number].left_upper_x, objects[object_number].left_upper_y),
-                (objects[object_number].right_lower_x, objects[object_number].right_lower_y))
+        bbox = ((objects[object_number].get_Left_Upper_x_smoothing(), objects[object_number].get_Left_Upper_y_smoothing()),
+                (objects[object_number].get_Right_Lower_x_smoothing(), objects[object_number].get_Right_Lower_y_smoothing()))
         # Draw the box on the image
         if objects[object_number].detected == True or objects[object_number].gracePeriod == True:
         #if True == True:
             #print("Really Drawing: ",objects[object_number].getInfo())
             cv2.rectangle(img, bbox[0], bbox[1], (0, 0, 255), 6)
 
+            text1 = "Vehicle: " + objects[object_number].getID()
+            text2 = "Color: " + objects[object_number].getColor()
+            text3 = "Distance: " + str(objects[object_number].getDistance())
+            cv2.putText(img,text1,(bbox[0][0],bbox[0][1]-60), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
+            cv2.putText(img,text2,(bbox[0][0],bbox[0][1]-40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
+            cv2.putText(img,text3,(bbox[0][0],bbox[0][1]-20), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
     # Return the image
 
     return img

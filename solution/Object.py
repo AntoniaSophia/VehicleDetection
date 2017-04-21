@@ -12,6 +12,8 @@ class Object():
         self.gracePeriod = False
         self.detectionThreshold = 6
 
+        self.objectHistory = []
+
     def setLocation(self,l_upper_y , l_upper_x , r_lower_y, r_lower_x):
         self.left_upper_y = l_upper_y
         self.left_upper_x = l_upper_x
@@ -63,14 +65,20 @@ class Object():
         if self.numberOfOccurances >0: 
             self.numberOfOccurances-=1
 
+            if len(self.objectHistory) >= 5:
+                self.objectHistory.pop(0)
+
         if self.numberOfOccurances < 24:
             self.gracePeriod = False
 
 
+
+
     def mergeObject(self,objectToMerge):
+
         if self.frameCounter < objectToMerge.frameCounter:
-            self.frameCounter = objectToMerge.frameCounter
-            self.objectNumber = objectToMerge.objectNumber
+            #self.frameCounter = objectToMerge.frameCounter
+            #self.objectNumber = objectToMerge.objectNumber
             self.left_upper_y = objectToMerge.left_upper_y
             self.left_upper_x = objectToMerge.left_upper_x
             self.right_lower_y = objectToMerge.right_lower_y
@@ -85,6 +93,8 @@ class Object():
         if self.numberOfOccurances >= self.detectionThreshold:
             #print("Setting object to detected " ,self.getInfo())  
             self.detected = True
+
+        self.objectHistory.append(self.clone())
 
         #print("Number of occurences = " ,self.numberOfOccurances)  
         return 
@@ -118,4 +128,71 @@ class Object():
            return 0
 
         return abs(x-w)*abs(y-h)
+
+    def get_Left_Upper_x_smoothing(self):
+        if len(self.objectHistory)>0:
+            value = 0
+            for nr in range(0, len(self.objectHistory)):            
+                value += self.objectHistory[nr].left_upper_x
+
+            returnValue = int(value/len(self.objectHistory))
+            #print("Returning " , returnValue , " instead of " , self.left_upper_x)
+            return returnValue
+
+        return self.left_upper_x
+
+    def get_Left_Upper_y_smoothing(self):
+        if len(self.objectHistory)>0:
+            value = 0
+            for nr in range(0, len(self.objectHistory)):            
+                value += self.objectHistory[nr].left_upper_y
+
+            returnValue = int(value/len(self.objectHistory))
+            #print("Returning " , returnValue , " instead of " , self.left_upper_y)
+            return returnValue
+        return self.left_upper_y
+
+    def get_Right_Lower_x_smoothing(self):
+        if len(self.objectHistory)>0:
+            value = 0
+            for nr in range(0, len(self.objectHistory)):            
+                value += self.objectHistory[nr].right_lower_x
+
+            returnValue = int(value/len(self.objectHistory))
+            #print("Returning " , returnValue , " instead of " , self.right_lower_x)
+            return returnValue
+        return self.right_lower_x
+
+
+    def get_Right_Lower_y_smoothing(self):
+        if len(self.objectHistory)>0:
+            value = 0
+            for nr in range(0, len(self.objectHistory)):            
+                value += self.objectHistory[nr].right_lower_y
+
+            returnValue = int(value/len(self.objectHistory))
+            #print("Returning " , returnValue , " instead of " , self.right_lower_y)
+            return returnValue
+        return self.right_lower_y
+
+    def clone(self):
+        returnObject = Object(self.frameCounter,self.objectNumber)
+        returnObject.detected = self.detected
+        returnObject.location = self.location
+        returnObject.left_upper_y = self.left_upper_y
+        returnObject.left_upper_x = self.left_upper_x
+        returnObject.right_lower_y = self.right_lower_y
+        returnObject.right_lower_x = self.right_lower_x
+        returnObject.frameCounter = self.frameCounter
+        returnObject.objectNumber = self.objectNumber
+        returnObject.numberOfOccurances = self.numberOfOccurances
+        returnObject.gracePeriod = self.gracePeriod 
+        returnObject.detectionThreshold = self.detectionThreshold
+
+        return returnObject        
  
+    def getColor(self):
+        return ""
+
+    def getDistance(self):
+        return -1        
