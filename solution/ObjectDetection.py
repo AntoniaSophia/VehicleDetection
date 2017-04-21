@@ -9,19 +9,20 @@ import glob
 import itertools
 from scipy.ndimage.measurements import label
 
+# ObjectDetection is the main class which executes the frame processing and searching for objects
 class ObjectDetection():
     def __init__(self):
-        self.svmConfigFilename = None
-        self.svc = None
-        self.X_scaler = None
-        self.orient = None
-        self.pix_per_cell = -1
-        self.cell_per_block = -1
-        self.spatial_size = -1
-        self.hist_bins = -1
-        self.objectsDetected = []        
-        self.hog_channel = -1
-        self.color_space = None
+        self.svmConfigFilename = None       # the file where the calibration of the Support Vector Machine is located
+        self.svc = None                     # the Support Vector Machine to be used
+        self.X_scaler = None                # the X_Scaler for feature normalization (must same as for svc training)
+        self.orient = None                  # the orientation of HOG (must same as for svc training)
+        self.pix_per_cell = -1              # pixel per cell (must same as for svc training)
+        self.cell_per_block = -1            # cells per block (must same as for svc training)
+        self.spatial_size = -1              # the spatial size (must same as for svc training)
+        self.hist_bins = -1                 # the histogram bins (must same as for svc training)
+        self.hog_channel = -1               # the HOG channels to be used for feature extraction (must same as for svc training)
+        self.color_space = None             # the color space to the used (must same as for svc training)
+        self.objectsDetected = []           # the list of detected objects
 
     def __init__(self,filename):
         self.svmConfigFilename = None
@@ -38,6 +39,7 @@ class ObjectDetection():
 
         self.loadSVMConfiguration(filename)
 
+    # load the SVM configuration file
     def loadSVMConfiguration(self,filename):
 
         dist_pickle = pickle.load(open(filename, "rb"))
@@ -51,28 +53,37 @@ class ObjectDetection():
         self.hog_channel = dist_pickle["hog_channel"]
         self.color_space = dist_pickle["color_space"]
 
+    # initialize all detected objects before a next frame is processed - this is an essential part of object tracking!!
     def initNextFrame(self):
         for object_number in range(0, len(self.objectsDetected)):
             self.objectsDetected[object_number].initNextFrame()
 
+    # track an object - this is the heart function of object tracking!!
+    # assume newObject as the newly found object in a frame
     def track_object(self,allObjects, newObject):
         existingObjectFound = False
 
+        # 1.Step: iterate through all exisiting objects
         for object_number in range(0, len(allObjects)):
             tempObject = allObjects[object_number]
 
+            # 2.Step: check whether there a high overlap with an already existing object
             overlap = tempObject.getOverlapVolume(newObject)
             #print("Overlap " , newObject.getInfo() , "  with existing " + tempObject.getInfo() , " : " , overlap)
+
+            # 3.Step: In case the overlap > 1000 than assume both objects are same and merge both objects
             if  overlap > 1000:
                 existingObjectFound = True            
                 tempObject.mergeObject(newObject)
 
+        # 4.Step: if no overlap match has been found --> append this object as newly found object
         if existingObjectFound == False:
             print("Appending object: " , newObject.getInfo())
             allObjects.append(newObject)
 
         return allObjects
 
+    # clean up rubbish objects that that no not appeared since the last 72 frames
     def cleanup_objects(self,allObjects,counter):
         result = []
         for object_number in range(0, len(allObjects)):
@@ -132,7 +143,6 @@ class ObjectDetection():
         hog3 = get_hog_features(ch3, orient, pix_per_cell,
                                 cell_per_block, feature_vec=False)
 
-        i = 0
         for xb in range(nxsteps):
             for yb in range(nysteps):
 
@@ -151,13 +161,9 @@ class ObjectDetection():
                 xleft = xpos*pix_per_cell
                 ytop = ypos*pix_per_cell
 
-                # Extract the image patch
+                # Extract the 64x64 image patch
                 subimg = cv2.resize(
                     ctrans_tosearch[ytop:ytop+window, xleft:xleft+window], (64, 64))
-
-                i += 1
-
-                #cv2.imwrite('./debug/img_temp_' + str(i) + '.jpg', subimg)
 
                 # Get color features
                 spatial_features = bin_spatial(subimg, size=spatial_size)
@@ -184,13 +190,16 @@ class ObjectDetection():
                     # print(find_rectangles)
         return find_rectangles
 
+    # process the next frame
     def processFrame(self,img,frameCounter,saveFrame=False):
         vehicle_boxes = []
         temp_vehicle_boxes = []
 
+        # 1.Step: define the searching area in y-direction where vehicles are being assumed
         ystart = 380
         ystop = 600
 
+        # 2.Step: apply different scales to function find_cars
         #################################
         temp_vehicle_boxes = []
         draw_color = (255,0,0) 
@@ -294,23 +303,23 @@ class ObjectDetection():
         # #################################
 
 
+        # 3.Step: apply heatmap to all detected object bounding boxes
         heat = np.zeros_like(img[:, :, 0]).astype(np.float)
         heat = add_heat(heat, vehicle_boxes)
-
-        # Visualize the heatmap when displaying
         heatmap = np.clip(heat, 0, 255)
         heatmap = apply_threshold(heatmap, 10)
 
-        # Find final boxes from heatmap using label function
-
+        # 4.Step:  Find final boxes from heatmap using label function
         labels = label(heatmap)
         print(labels[1], 'cars found')
 
-
-
+        # 5. Step: extract the "raw objects" from all objects that have been found according to the heatmap
         foundObjects = create_Objects_from_Labels(labels,frameCounter)
 
+        # 6.Step: now apply object plausibilization and object tracking to all "raw objects"
         for object_number in range(0, len(foundObjects)):
+
+            # 7. Step: take the bounding box of the object, resize it to 64x64 pixels and apply it on the SVC again 
             img_temp = np.copy(img)
             img_tosearch = img_temp[foundObjects[object_number].left_upper_y:foundObjects[object_number].right_lower_y,foundObjects[object_number].left_upper_x:foundObjects[object_number].right_lower_x,:]
             subimg = cv2.resize(img_tosearch[:,:], (64, 64))
@@ -327,16 +336,20 @@ class ObjectDetection():
             test_confidence = self.svc.decision_function(test_features)
             print("Object found with confidence: " , test_confidence)
 
+            # 8.Step: now use confidence of the SVM and consider all objects below the threshold 0.4 as non-detections --> sorting  out!
             if test_prediction > 0 and test_confidence > 0.4:
+                # 9. Test: in case the threshold value of 0.4 has been passed --> call object tracking function
                 self.track_object(self.objectsDetected , foundObjects[object_number])
 
         print("Length: Temp" , len(foundObjects))
         print("Length All: " , len(self.objectsDetected))
 
 
-        #if counter%100 == 0:
-        #    self.objectsDetected = self.cleanup_objects(self.objectsDetected,counter)
+        # 10.Step: do a cleanup of ghost objects from time to time
+        if frameCounter%100 == 0:
+            self.objectsDetected = self.cleanup_objects(self.objectsDetected,frameCounter)
 
+        # save the image in a folder for debugging purposes
         if saveFrame==True:
             draw_img = draw_objects(np.copy(img), self.objectsDetected)
             mpimg.imsave('./../output/img_' + str(counter) + '.png', draw_img)

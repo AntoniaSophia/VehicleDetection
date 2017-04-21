@@ -900,8 +900,8 @@ def videotest():
         ret, frame = cap.read()
         counter += 1
 
-        #if counter < 1000:
-        #    continue
+        if counter < 1000:
+            continue
 
 
         # check for corrupted frames and drop them if necessary
@@ -926,7 +926,7 @@ def videotest():
         testFrame.processCurrentFrame(counter)
         
         # and store the resulting annotated overlay frame 
-        out.write(testFrame.getOverlayImage())
+        #out.write(testFrame.getOverlayImage())
 
 
         # save single frames on left button click for debugging purposes

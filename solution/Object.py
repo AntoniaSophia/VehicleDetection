@@ -1,19 +1,25 @@
+# Objects that can be detected 
+# actually this could be different kinds of objects like cars, trucks, bikes,... 
+# but only a general class is currently being implemented
 class Object():
+    # initial the object 
+    # counter = number of the frame in which this object has been detected
+    # number = number of the object to be detected in this frame
     def __init__(self,counter,number):
-        self.detected = False
-        self.location = None
-        self.left_upper_y = -1
-        self.left_upper_x = -1
-        self.right_lower_y = -1
-        self.right_lower_x = -1
-        self.frameCounter = counter
-        self.objectNumber = number
-        self.numberOfOccurances = 0
-        self.gracePeriod = False
-        self.detectionThreshold = 6
+        self.detected = False           # indicates whether an object has been confirmed as detected 
+        self.left_upper_y = -1          # left upper y value of object bounding box
+        self.left_upper_x = -1          # left upper x value of object bounding box
+        self.right_lower_y = -1         # right lower y value of object bounding box
+        self.right_lower_x = -1         # right lower x value of object bounding box
+        self.frameCounter = counter     # number of the frame in which the object has been detected
+        self.objectNumber = number      # number of the object which has been detected in this frame
+        self.numberOfOccurances = 0     # a counter which counts the number of occurences of this object
+        self.gracePeriod = False        # in case an object has a stable detection it shall not happen to disappear suddenly in case it fails in one frame
+        self.detectionThreshold = 6     # threshold of the minimal number of subsequent occurences of an object before it is confirmed as existing
 
-        self.objectHistory = []
+        self.objectHistory = []         # history of latest found objects in order to smoothen the bounding boxes and avoid "jumping"
 
+    # set the location of the object (all 4 coordinates of the bounding boxes)
     def setLocation(self,l_upper_y , l_upper_x , r_lower_y, r_lower_x):
         self.left_upper_y = l_upper_y
         self.left_upper_x = l_upper_x
@@ -23,7 +29,7 @@ class Object():
 
         #print("Value of object in pixels " , self.getVolume())
 
-
+    # validate whether an object is a "real" object or just a potential real object
     def validate(self):
         if self.left_upper_y == -1:
             self.detected = False
@@ -42,6 +48,7 @@ class Object():
             self.detected = False
             return False 
 
+        #threshold of the minimal number of subsequent occurences of an object before it is confirmed as existing
         if self.numberOfOccurances < self.detectionThreshold:
             self.detected = False
             return False 
@@ -49,74 +56,83 @@ class Object():
 
         return True            
 
+    # just return basic information about this object
     def getInfo(self):
         id = self.getID() + " - "
         result = id + "Left_Upper_y: " + str(self.left_upper_y) + " , Left_Upper_x: " + str(self.left_upper_x) 
         result = result + " , Right_Lower_y: " + str(self.right_lower_y) + " , Right_Lower_x: " + str(self.right_lower_x) 
         return result
 
+    # just return the ID of this object
     def getID(self):
         return "ID_" + str(self.frameCounter) + "_" + str(self.objectNumber)
 
-
+    # initialize an object before a next frame is processed - this is an essential part of object tracking!!
     def initNextFrame(self):
+        # no mercy !! every object has to proove existance again!
         self.detected = False
 
+        # no mercy !! reduce the occurance counter
         if self.numberOfOccurances >0: 
             self.numberOfOccurances-=1
 
+            #in case we have more than 5 historic object data just remove the latest one
             if len(self.objectHistory) >= 5:
                 self.objectHistory.pop(0)
 
+        # ok, some mercy......in case an object has been detected subsequentally over 24 frames it gets some mercy.....
+        # else remove the mercy.....
         if self.numberOfOccurances < 24:
             self.gracePeriod = False
 
 
 
-
+    # this is also an essential part of object tracking: merge two identical objects
     def mergeObject(self,objectToMerge):
-
+        # only merge in case the new object has a higher frame counter
         if self.frameCounter < objectToMerge.frameCounter:
             #self.frameCounter = objectToMerge.frameCounter
             #self.objectNumber = objectToMerge.objectNumber
+
+            # don't copy the object - but update the existing object!!
             self.left_upper_y = objectToMerge.left_upper_y
             self.left_upper_x = objectToMerge.left_upper_x
             self.right_lower_y = objectToMerge.right_lower_y
             self.right_lower_x = objectToMerge.right_lower_x
 
+        # increase the occurence counter
         self.numberOfOccurances+=2
 
+        # ok, some mercy......in case an object has been detected subsequentally over 24 frames it gets some mercy.....
         if self.numberOfOccurances > 24:
             self.gracePeriod = True
+            # limit the occurence counter to 30
             self.numberOfOccurances = 30
 
+
+        #threshold of the minimal number of subsequent occurences of an object before it is confirmed as existing
         if self.numberOfOccurances >= self.detectionThreshold:
             #print("Setting object to detected " ,self.getInfo())  
             self.detected = True
 
+        # finally append the object to the object history......
         self.objectHistory.append(self.clone())
 
         #print("Number of occurences = " ,self.numberOfOccurances)  
         return 
 
 
+    # return the volume in pixels of this object
     def getVolume(self):
         return (self.right_lower_x - self.left_upper_x)*(self.right_lower_y - self.left_upper_y)
 
-
+    # return the overlap volume of two objects
     def getOverlapVolume(self, otherObject):
         x = max(self.left_upper_x , otherObject.left_upper_x)
         y = max(self.left_upper_y , otherObject.left_upper_y)
 
         w = min(self.left_upper_x + self.right_lower_x , otherObject.left_upper_x + otherObject.right_lower_x) - x
         h = min(self.left_upper_y + self.right_lower_y , otherObject.left_upper_y + otherObject.right_lower_y) - y
-
-#x = max(1011,902)
-#min(902+975 , 1011+1223
-#       1877 , 2234
-
-
-#        print("X= " , x , "Y= ", y , "W= " , w, "H= " , h)
 
         if w<0 or h<0: 
            return 0
@@ -129,6 +145,7 @@ class Object():
 
         return abs(x-w)*abs(y-h)
 
+    # return the left_upper_x coordinate in a smoothened way
     def get_Left_Upper_x_smoothing(self):
         if len(self.objectHistory)>0:
             value = 0
@@ -141,6 +158,7 @@ class Object():
 
         return self.left_upper_x
 
+    # return the left_upper_y coordinate in a smoothened way
     def get_Left_Upper_y_smoothing(self):
         if len(self.objectHistory)>0:
             value = 0
@@ -152,6 +170,7 @@ class Object():
             return returnValue
         return self.left_upper_y
 
+    # return the right_lower_x coordinate in a smoothened way
     def get_Right_Lower_x_smoothing(self):
         if len(self.objectHistory)>0:
             value = 0
@@ -164,6 +183,7 @@ class Object():
         return self.right_lower_x
 
 
+    # return the right_lower_y coordinate in a smoothened way
     def get_Right_Lower_y_smoothing(self):
         if len(self.objectHistory)>0:
             value = 0
@@ -175,10 +195,10 @@ class Object():
             return returnValue
         return self.right_lower_y
 
+    # clone an object
     def clone(self):
         returnObject = Object(self.frameCounter,self.objectNumber)
         returnObject.detected = self.detected
-        returnObject.location = self.location
         returnObject.left_upper_y = self.left_upper_y
         returnObject.left_upper_x = self.left_upper_x
         returnObject.right_lower_y = self.right_lower_y
@@ -191,8 +211,10 @@ class Object():
 
         return returnObject        
  
+    # return the color of an object
     def getColor(self):
         return ""
 
+    # return the distance of an object to the ego vehicle
     def getDistance(self):
         return -1        

@@ -6,7 +6,7 @@ from skimage.feature import hog
 import matplotlib.pyplot as plt
 from Object import *
 
-
+# a function to convert the color space
 def convert_color(img, conv='RGB2YCrCb'):
     if conv == 'RGB2YCrCb':
         return cv2.cvtColor(img, cv2.COLOR_RGB2YCrCb)
@@ -107,7 +107,7 @@ def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
     # Return list of feature vectors
     return features
 
-# Define a function to extract features from a list of images
+# Define a function to extract features from a single image
 # Have this function call bin_spatial() and color_hist()
 def extract_features_img(image, color_space='RGB', spatial_size=(32, 32),
                         hist_bins=32, orient=9, 
@@ -201,6 +201,7 @@ def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
     return window_list
 
 
+# Simply append boxes 
 def append_boxes(a,b):
     for i in range(0,len(b),1):
         a.append([b[i][0], b[i][1]])
@@ -220,7 +221,7 @@ def draw_boxes(img, bboxes, color=(0, 0, 255), thick=6):
     # Return the image copy with boxes drawn
     return imcopy
 
-
+# Fuinction to draw labeled boxes
 def draw_labeled_bboxes(img, labels):
     # Iterate through all detected cars
     for car_number in range(1, labels[1]+1):
@@ -238,6 +239,7 @@ def draw_labeled_bboxes(img, labels):
     return img
 
 
+# Draw object from ObjectDetection - consider detected status, grace period and add nice text
 def draw_objects(img, objects):
     # Iterate through all detected cars
     for object_number in range(0, len(objects)):
@@ -261,7 +263,7 @@ def draw_objects(img, objects):
 
     return img
 
-
+# Create objects from labels
 def create_Objects_from_Labels(labels,counter):
     # Iterate through all detected cars
     objectsFound = []
@@ -279,12 +281,13 @@ def create_Objects_from_Labels(labels,counter):
         newObject = Object(counter, car_number)
         newObject.setLocation(np.min(nonzeroy), np.min(nonzerox), np.max(nonzeroy), np.max(nonzerox))
 
+        # only consider objects with a pixel volume size of minimum 1000
         if newObject.getVolume() > 1000:
             objectsFound.append(newObject)
 
     return objectsFound
 
-
+# add heat to bounding boxes
 def add_heat(heatmap, bbox_list):
     # Iterate through list of bboxes
     for box in bbox_list:
@@ -295,7 +298,7 @@ def add_heat(heatmap, bbox_list):
     # Return updated heatmap
     return heatmap
 
-
+# apply a threshold to a heatmap
 def apply_threshold(heatmap, threshold):
     # Zero out pixels below the threshold
     heatmap[heatmap <= threshold] = 0
