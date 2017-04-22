@@ -19,6 +19,9 @@ class Object():
 
         self.objectHistory = []         # history of latest found objects in order to smoothen the bounding boxes and avoid "jumping"
 
+        self.color = ""
+        self.relativeDistance = -1
+
     # set the location of the object (all 4 coordinates of the bounding boxes)
     def setLocation(self,l_upper_y , l_upper_x , r_lower_y, r_lower_x):
         self.left_upper_y = l_upper_y
@@ -99,6 +102,8 @@ class Object():
             self.left_upper_x = objectToMerge.left_upper_x
             self.right_lower_y = objectToMerge.right_lower_y
             self.right_lower_x = objectToMerge.right_lower_x
+
+            self.relativeDistance = objectToMerge.relativeDistance
 
         # increase the occurence counter
         self.numberOfOccurances+=2
@@ -208,13 +213,19 @@ class Object():
         returnObject.numberOfOccurances = self.numberOfOccurances
         returnObject.gracePeriod = self.gracePeriod 
         returnObject.detectionThreshold = self.detectionThreshold
+        returnObject.color = self.color
+        returnObject.relativeDistance = self.relativeDistance
 
         return returnObject        
  
     # return the color of an object
     def getColor(self):
-        return ""
+        return self.color
 
-    # return the distance of an object to the ego vehicle
-    def getDistance(self):
-        return -1        
+    # return the relative distance of an object to the ego vehicle
+    def getRelDistance(self):
+        return self.relativeDistance       
+
+    # return the relative speed of an object to the ego vehicle
+    def getRelSpeed(self):
+        return -1                

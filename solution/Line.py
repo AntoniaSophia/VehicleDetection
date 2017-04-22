@@ -687,7 +687,7 @@ class Frame():
         self.modifiedImg = None
         self.currentEgoLaneOverlay = None
         self.egoLane = EgoLane()
-        self.objectDetection = ObjectDetection('../svm_cal/svc_pickle.p')
+        self.objectDetection = None
         self.camera = None
 
     # load an image from a file
@@ -750,9 +750,10 @@ class Frame():
     # initialize the camera with the calibration data from the presiously created pickle
     def initializeCamera(self, fileName='../camera_cal/camera_calibration_pickle.p'):
         self.camera = Camera(fileName)
+        self.initializeSVMConfiguration()
 
     def initializeSVMConfiguration(self, fileName='../svm_cal/svc_pickle.p'):
-        self.objectDetection = ObjectDetection(fileName)
+        self.objectDetection = ObjectDetection(fileName, self.camera.M)
 
 # Camera class which contains all relevant camera information
 class Camera():

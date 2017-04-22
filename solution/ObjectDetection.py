@@ -5,9 +5,12 @@ import pickle
 import cv2
 from Helper_Functions import *
 from Object import *
+from peakdetect import *
+from ColorThief import ColorThief
 import glob
 import itertools
 from scipy.ndimage.measurements import label
+from scipy import signal
 
 # ObjectDetection is the main class which executes the frame processing and searching for objects
 class ObjectDetection():
@@ -23,8 +26,9 @@ class ObjectDetection():
         self.hog_channel = -1               # the HOG channels to be used for feature extraction (must same as for svc training)
         self.color_space = None             # the color space to the used (must same as for svc training)
         self.objectsDetected = []           # the list of detected objects
+        self.M = None                       # Transformation Matrix M
 
-    def __init__(self,filename):
+    def __init__(self,filename,M):
         self.svmConfigFilename = None
         self.svc = None
         self.X_scaler = None
@@ -36,6 +40,7 @@ class ObjectDetection():
         self.objectsDetected = []      
         self.hog_channel = -1  
         self.color_space = None
+        self.M = M                    
 
         self.loadSVMConfiguration(filename)
 
@@ -338,14 +343,49 @@ class ObjectDetection():
 
             # 8.Step: now use confidence of the SVM and consider all objects below the threshold 0.4 as non-detections --> sorting  out!
             if test_prediction > 0 and test_confidence > 0.4:
-                # 9. Test: in case the threshold value of 0.4 has been passed --> call object tracking function
+                # 9.Step calculate the color of the object
+                # process img_tosearch....
+                cv2.imwrite('c:/temp/image_colorthief.png',img_tosearch)
+                color_thief = ColorThief('c:/temp/image_colorthief.png')
+                # get the dominant color
+                #dominant_color = color_thief.get_color(quality=1)
+                palette = color_thief.get_palette(color_count=2)
+                #print("Palette = " , palette[0])
+                actual_name, closest_name = get_color_name(palette[0])
+                foundObjects[object_number].color = closest_name
+                #print("Dominant color = " , palette[0])
+                #print("Color Name = " , actual_name)
+                #print("closest_name  = " , closest_name)
+                #del palette
+                #warped2 = cv2.warpPerspective(point, self.M, (1,2),flags=cv2.INTER_LINEAR)
+
+                # 10.Step calculate the relative distance of the object
+                pos = np.array((foundObjects[object_number].left_upper_x + 
+                    (foundObjects[object_number].right_lower_x-foundObjects[object_number].left_upper_x)/2,foundObjects[object_number].right_lower_y),dtype="float32").reshape(1, 1, -1)
+                reference_warped = np.array((720,640),dtype="float32").reshape(1, 1, -1)
+                #print("Pos: " ,pos)
+
+                dst1 = cv2.perspectiveTransform(pos, self.M).reshape(-1, 1)
+                dst_warped = cv2.perspectiveTransform(reference_warped, self.M).reshape(-1, 1)
+                #print(dst1)
+                #print(dst_warped)                
+                ym_per_pix = 30/720
+                distance = round(((dst_warped[1]-dst1[1])*ym_per_pix)[0],2)
+                #print(distance)
+                foundObjects[object_number].relativeDistance = distance
+
+                # 11.Step calculate the relative speed of the object
+                # process img_tosearch....
+
+                # 12. Test: in case the threshold value of 0.4 has been passed --> call object tracking function
                 self.track_object(self.objectsDetected , foundObjects[object_number])
+
 
         print("Length: Temp" , len(foundObjects))
         print("Length All: " , len(self.objectsDetected))
 
 
-        # 10.Step: do a cleanup of ghost objects from time to time
+        # 11.Step: do a cleanup of ghost objects from time to time
         if frameCounter%100 == 0:
             self.objectsDetected = self.cleanup_objects(self.objectsDetected,frameCounter)
 

@@ -2,9 +2,30 @@ import matplotlib.image as mpimg
 import numpy as np
 import cv2
 from skimage.feature import hog
-
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.pyplot import plot, scatter, show
 import matplotlib.pyplot as plt
 from Object import *
+import webcolors
+
+def closest_color(requested_colour):
+    min_colours = {}
+    for key, name in webcolors.css3_hex_to_names.items():
+        r_c, g_c, b_c = webcolors.hex_to_rgb(key)
+        rd = (r_c - requested_colour[0]) ** 2
+        gd = (g_c - requested_colour[1]) ** 2
+        bd = (b_c - requested_colour[2]) ** 2
+        min_colours[(rd + gd + bd)] = name
+    return min_colours[min(min_colours.keys())]
+
+def get_color_name(requested_colour):
+    try:
+        closest_name = actual_name = webcolors.rgb_to_name(requested_colour)
+    except ValueError:
+        closest_name = closest_color(requested_colour)
+        actual_name = None
+    return actual_name, closest_name
+
 
 # a function to convert the color space
 def convert_color(img, conv='RGB2YCrCb'):
@@ -255,10 +276,12 @@ def draw_objects(img, objects):
 
             text1 = "Vehicle: " + objects[object_number].getID()
             text2 = "Color: " + objects[object_number].getColor()
-            text3 = "Distance: " + str(objects[object_number].getDistance())
-            cv2.putText(img,text1,(bbox[0][0],bbox[0][1]-60), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
-            cv2.putText(img,text2,(bbox[0][0],bbox[0][1]-40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
-            cv2.putText(img,text3,(bbox[0][0],bbox[0][1]-20), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
+            text3 = "Rel. distance: " + str(objects[object_number].getRelDistance()) + " (m)"
+            text4 = "Rel. speed: " + str(objects[object_number].getRelSpeed())
+            cv2.putText(img,text1,(bbox[0][0],bbox[0][1]-80), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
+            cv2.putText(img,text2,(bbox[0][0],bbox[0][1]-60), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
+            cv2.putText(img,text3,(bbox[0][0],bbox[0][1]-40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
+            cv2.putText(img,text4,(bbox[0][0],bbox[0][1]-20), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
     # Return the image
 
     return img
@@ -305,4 +328,31 @@ def apply_threshold(heatmap, threshold):
     # Return thresholded map
     return heatmap
 
+# do a 3D color plot of a small image 64x64
+def plot3d(pixels, colors_rgb,
+        axis_labels=list("RGB"), axis_limits=[(0, 255), (0, 255), (0, 255)]):
+    """Plot pixels in 3D."""
 
+    # Create figure and 3D axes
+    fig = plt.figure(figsize=(8, 8))
+    ax = Axes3D(fig)
+
+    # Set axis limits
+    ax.set_xlim(*axis_limits[0])
+    ax.set_ylim(*axis_limits[1])
+    ax.set_zlim(*axis_limits[2])
+
+    # Set axis labels and sizes
+    ax.tick_params(axis='both', which='major', labelsize=14, pad=8)
+    ax.set_xlabel(axis_labels[0], fontsize=16, labelpad=16)
+    ax.set_ylabel(axis_labels[1], fontsize=16, labelpad=16)
+    ax.set_zlabel(axis_labels[2], fontsize=16, labelpad=16)
+
+    # Plot pixel values with colors given in colors_rgb
+    ax.scatter(
+        pixels[:, :, 0].ravel(),
+        pixels[:, :, 1].ravel(),
+        pixels[:, :, 2].ravel(),
+        c=colors_rgb.reshape((-1, 3)), edgecolors='none')
+
+    return ax  # return Axes3D object for further manipulati
