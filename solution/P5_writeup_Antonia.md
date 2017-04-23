@@ -10,8 +10,8 @@ The goals / steps of this project are the following:
 * Estimate a bounding box for vehicles detected.
 
 [//]: # (Image References)
-[image1]: ./examples/car_not_car.png
-[image2]: ./examples/HOG_example.jpg
+[image1]: ./../docu/car_example.png
+[image2]: ./../docu/noncar_example.png
 [image3]: ./examples/sliding_windows.jpg
 [image4]: ./examples/sliding_window.jpg
 [image5]: ./examples/bboxes_and_heat.png
@@ -25,7 +25,6 @@ The goals / steps of this project are the following:
 ###Files Submitted & Code Quality
 
 * link to Train_Classifier.py [Training for the SVM classifier](https://github.com/AntoniaSophia/VehicleDetection/blob/master/solution/Train_Classifier.py)
-* link to Calibrate_Camera.py [Calibrate the Camera](https://github.com/AntoniaSophia/CarND-Advanced-Lane-Lines/blob/master/solution/Calibrate_Camera.py)  
 * link to Jupyter monitor which shows training of the SVM classifier and heatmaps [Notebook](https://github.com/AntoniaSophia/VehicleDetection/blob/master/solution/VehicleDetection.ipynb)
 * link to HTML output of the Jupyter monitor which shows calibration and warp calculation [Notebook HTML](https://github.com/AntoniaSophia/VehicleDetection/blob/master/solution/VehicleDetection.html)
 * link to the annotated output video of the project_video.mp4 at [Project video](https://github.com/AntoniaSophia/VehicleDetection/blob/master/output_videos/project_video.mp4)
@@ -34,18 +33,20 @@ The goals / steps of this project are the following:
 ---
 ###Writeup / README
 
-####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Vehicle-Detection/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
-
 
 ###Histogram of Oriented Gradients (HOG)
 
 ####1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).  
+The code for this step is contained in the first code cell of the IPython notebook [Notebook](https://github.com/AntoniaSophia/VehicleDetection/blob/master/solution/VehicleDetection.ipynb) in cell 4.  
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
 
-![alt text][image1]
+Car example
+![car example][image1]
+
+Non-Car example
+![non-car example][image2]
 
 I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 
@@ -56,21 +57,20 @@ Here is an example using the `YCrCb` color space and HOG parameters of `orientat
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and finally came out with the following cell 3 ...
+I tried various combinations of parameters and finally came out with the following cell 5 ...
 
 | Variable        | Value   | 
 |:-------------:|:-------------:| 
-| color_space 
- # Can be RGB, HSV, LUV, HLS, YUV, YCrCb     | 'YCrCb'       | 
-| orient   # HOG orientations   | 9     |
-| pix_per_cell   # HOG pixels per cell     | 8      |
-| cell_per_block  # HOG cells per block    | 2      |
-| hog_channel  # Can be 0, 1, 2, or "ALL"    | 'ALL'       |
-| spatial_size  # Spatial binning dimensions    | (16, 16)       |
-| hist_bins # Number of histogram bins      | 128        |
-| spatial_feat # Spatial features on or off     | True        |
-| hist_feat # Histogram features on or off     | True   |
-| hog_feat  # HOG features on or off    | True       |
+| color_space  (# Can be RGB, HSV, LUV, HLS, YUV, YCrCb)     | 'YCrCb'       | 
+| orient   (# HOG orientations)   | 9     |
+| pix_per_cell   (# HOG pixels per cell)     | 8      |
+| cell_per_block  (# HOG cells per block)    | 2      |
+| hog_channel  (# Can be 0, 1, 2, or "ALL")    | 'ALL'       |
+| spatial_size  (# Spatial binning dimensions)    | (16, 16)       |
+| hist_bins (# Number of histogram bins)      | 128        |
+| spatial_feat (# Spatial features on or off)     | True        |
+| hist_feat (# Histogram features on or off)     | True   |
+| hog_feat  (# HOG features on or off)    | True       |
 
 
 
