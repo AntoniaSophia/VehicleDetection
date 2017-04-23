@@ -36,7 +36,7 @@ The goals / steps of this project are the following:
 [image40]: ./../docu/frame_560_orig.png
 [image41]: ./../docu/frame_560_heatmap.png
 [image42]: ./../docu/frame_560_labels.png
-[image43]: ./../docu/frame_560_final_box.png
+[image43]: ./../docu/frame_560__final_box.png
 
 [image50]: ./../docu/frame_730_orig.png
 [image51]: ./../docu/frame_730_heatmap.png
@@ -245,7 +245,7 @@ def find_cars(self,img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cel
 ```
 
 
-Here are some pictures which show this window coverage of the searching area
+Here are some pictures which show this window coverage of the searching area:
 ![window search][image8]
 
 
@@ -253,13 +253,13 @@ Here are some pictures which show this window coverage of the searching area
 
 Ultimately I searched on 8 scales (1.0 , 1.3, 1.5, 1.7, 2, 0.8, 0.6, 0.4) using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
 
-Scale 1.0
+Scale 1.0:
 ![Window Search Scale 1][image10]
 
-Scale 2.0
+Scale 2.0:
 ![Window Search Scale 2][image11]
 
-Scale 0.6
+Scale 0.6:
 ![Window Search Scale 0.6][image9]
 
 
@@ -296,111 +296,81 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 ### Here are six frames and their corresponding heatmaps:
 
-Frame 1 - original image
-
+Frame 1 - original image:
 ![image20][image20]
 
-
-Frame 1 - corresponding heatmap
-
+Frame 1 - corresponding heatmap:
 ![image21][image21]
 
-
-Frame 160 - original image
-
+Frame 160 - original image:
 ![image30][image30]
 
-
-Frame 160 - corresponding heatmap
-
+Frame 160 - corresponding heatmap:
 ![image31][image31] 
 
-Frame 560 - original image
-
+Frame 560 - original image:
 ![image40][image40] 
 
-Frame 560 - corresponding heatmap
-
+Frame 560 - corresponding heatmap:
 ![image41][image41] 
 
-
-Frame 730 - original image
-
+Frame 730 - original image:
 ![image50][image50] 
 
-Frame 730 - corresponding heatmap
-
+Frame 730 - corresponding heatmap:
 ![image51][image51] 
 
-Frame 760 - original image
-
+Frame 760 - original image:
 ![image60][image60] 
 
-Frame 760 - corresponding heatmap
-
+Frame 760 - corresponding heatmap:
 ![image61][image61] 
 
 
-Frame 1000 - original image
-
+Frame 1000 - original image:
 ![image70][image70] 
 
-Frame 1000 - corresponding heatmap
-
+Frame 1000 - corresponding heatmap:
 ![image71][image71] 
 
 
 ### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-Frame 1 - labels in gray after thresholding
-
+Frame 1 - labels in gray after thresholding:
 ![image22][image22]
 
-Frame 160 - labels in gray after thresholding
-
+Frame 160 - labels in gray after thresholding:
 ![image32][image32]
 
-Frame 560 - labels in gray after thresholding
-
+Frame 560 - labels in gray after thresholding:
 ![image42][image42]
 
-Frame 730 - labels in gray after thresholding
-
+Frame 730 - labels in gray after thresholding:
 ![image52][image52]
 
-Frame 760 - labels in gray after thresholding
-
+Frame 760 - labels in gray after thresholding:
 ![image62][image62]
 
-Frame 1000 - labels in gray after thresholding
-
+Frame 1000 - labels in gray after thresholding:
 ![image72][image72]
 
 ### Here the resulting bounding boxes are drawn onto the last frame in the series:
 Frame 1 - final boxes
-
-![image23][image23]
-
+![image23][image23]:
 
 Frame 160 - final boxes
-
-![image33][image33]
+![image33][image33]:
 
 Frame 560 - final boxes
-
-![image43][image43]
+![image43][image43]:
 
 Frame 730 - final boxes
-
-![image53][image53]
+![image53][image53]:
 
 Frame 760 - final boxes
-
-![image63][image63]
-
+![image63][image63]:
 
 Frame 1000 - final boxes
-
-![image73][image73]
+![image73][image73]:
 
 
 
