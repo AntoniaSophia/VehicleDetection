@@ -23,35 +23,35 @@ The goals / steps of this project are the following:
 [image11]: ./../docu/window_search_scale_2.png
 
 
-[image20]: ./../docu/frame_1_orig
-[image21]: ./../docu/frame_1_heatmap
-[image22]: ./../docu/frame_1_labels
-[image23]: ./../docu/frame_1_final_box
+[image20]: ./../docu/frame_1_orig.png
+[image21]: ./../docu/frame_1_heatmap.png
+[image22]: ./../docu/frame_1_labels.png
+[image23]: ./../docu/frame_1_final_box.png
 
-[image30]: ./../docu/frame_160_orig
-[image31]: ./../docu/frame_160_heatmap
-[image32]: ./../docu/frame_160_labels
-[image33]: ./../docu/frame_160_final_box
+[image30]: ./../docu/frame_160_orig.png
+[image31]: ./../docu/frame_160_heatmap.png
+[image32]: ./../docu/frame_160_labels.png
+[image33]: ./../docu/frame_160_final_box.png
 
-[image40]: ./../docu/frame_560_orig
-[image41]: ./../docu/frame_560_heatmap
-[image42]: ./../docu/frame_560_labels
-[image43]: ./../docu/frame_560_final_box
+[image40]: ./../docu/frame_560_orig.png
+[image41]: ./../docu/frame_560_heatmap.png
+[image42]: ./../docu/frame_560_labels.png
+[image43]: ./../docu/frame_560_final_box.png
 
-[image50]: ./../docu/frame_730_orig
-[image51]: ./../docu/frame_730_heatmap
-[image52]: ./../docu/frame_730_labels
-[image53]: ./../docu/frame_730_final_box
+[image50]: ./../docu/frame_730_orig.png
+[image51]: ./../docu/frame_730_heatmap.png
+[image52]: ./../docu/frame_730_labels.png
+[image53]: ./../docu/frame_730_final_box.png
 
-[image60]: ./../docu/frame_760_orig
-[image61]: ./../docu/frame_760_heatmap
-[image62]: ./../docu/frame_760_labels
-[image63]: ./../docu/frame_760_final_box
+[image60]: ./../docu/frame_760_orig.png
+[image61]: ./../docu/frame_760_heatmap.png
+[image62]: ./../docu/frame_760_labels.png
+[image63]: ./../docu/frame_760_final_box.png
 
-[image70]: ./../docu/frame_1000_orig
-[image71]: ./../docu/frame_1000_heatmap
-[image72]: ./../docu/frame_1000_labels
-[image73]: ./../docu/frame_1000_final_box
+[image70]: ./../docu/frame_1000_orig.png
+[image71]: ./../docu/frame_1000_heatmap.png
+[image72]: ./../docu/frame_1000_labels.png
+[image73]: ./../docu/frame_1000_final_box.png
 
 [video1]: ./output_videos/project_video.mp4
 
