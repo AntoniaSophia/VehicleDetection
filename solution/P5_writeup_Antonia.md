@@ -12,12 +12,13 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 [image1]: ./../docu/car_example.png
 [image2]: ./../docu/noncar_example.png
-[image3]: ./examples/sliding_windows.jpg
-[image4]: ./examples/sliding_window.jpg
-[image5]: ./examples/bboxes_and_heat.png
-[image6]: ./examples/labels_map.png
-[image7]: ./examples/output_bboxes.png
-[video1]: ./project_video.mp4
+[image3]: ./../docu/hog_example_orig.png
+[image4]: ./../docu/hog_example_YCrCb.png
+[image5]: ./../docu/hog_example_channel_0.png
+[image6]: ./../docu/hog_example_channel_1.png
+[image7]: ./../docu/hog_example_channel_2.png
+[video1]: ./output_videos/project_video.mp4
+
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
 ###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
@@ -49,11 +50,23 @@ Non-Car example
 ![non-car example][image2]
 
 I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
-
 Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
+![HOG example orig][image3]
 
+The same image converted into color space `YCrCb`
+![HOG converted to `YCrCb`][image4]
 
-![alt text][image2]
+Now the HOG channel 0 from this image
+![HOG channel 2][image5]
+
+Now the HOG channel 1 from this image
+![HOG channel 1][image6]
+
+Now the HOG channel 2 from this image
+![HOG channel 2][image7]
+
+Using this color space `YCrCb` gives much better deviations in the HOG channels than other color spaces as I found out. Differences in the above examples are clearly visible. Thus I decided to go for this color space using all HOG channels for feature extraction
+
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
@@ -124,9 +137,19 @@ Here's an example result showing the heatmap from a series of frames of video, t
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
 
+shadow has not been tested at all
+night images have not been provided (makes no sense possibly anyway!?)
+only cars can be detected, no trucks or bikes
+object tracking is adjusted most likely to slow moving objects 
+
 Relative speed:
 - bounding box gets bigger
 - curvature not calculated
+- adjust bounding boxes to be more accurate
+
+better: kalman filter and better bounding boxes
+
+
 
 Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
 
