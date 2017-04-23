@@ -80,7 +80,7 @@ The goals / steps of this project are the following:
 
 ####1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for this step is contained in the first code cell of the IPython notebook [Notebook](https://github.com/AntoniaSophia/VehicleDetection/blob/master/solution/VehicleDetection.ipynb) in cell ??.  
+The code for this step is contained in the first code cell of the IPython notebook [Notebook](https://github.com/AntoniaSophia/VehicleDetection/blob/master/solution/VehicleDetection.ipynb) in cells 9-13.  
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
 
@@ -119,7 +119,7 @@ Using this color space `YCrCb` gives much better deviations in the HOG channels 
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and finally came out with the following cell ?? ...
+I tried various combinations of parameters and finally came out with the following cell 5:
 
 | Variable        | Value   | 
 |:-------------:|:-------------:| 
@@ -138,16 +138,16 @@ I tried various combinations of parameters and finally came out with the followi
 
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using 80% training data and 20% test data (see cell ??)
-Furthermore a standard feature scaler in order to prevent some features to be valued much stronger because of different input scaling. (see cell ??)
-With this setup I reached an accuracy of 99.2% and decided not to play around any further (see cell ??) - the effect of a better result seems to be small compared to problems in the further steps like pipelining or false positive detection.
+I trained a linear SVM using 80% training data and 20% test data (see cell 16)
+Furthermore a standard feature scaler in order to prevent some features to be valued much stronger because of different input scaling. (see cell 16)
+With this setup I reached an accuracy of 99.05% and decided not to play around any further (see cell 19) - the effect of a better result seems to be small compared to problems in the further steps like pipelining or false positive detection.
 
 ###Sliding Window Search
 
 ####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
 - I decided to search for vehicles in the y-scale [380:600] because the the road is more or less flat.
-- than I created sliding windows of size 64x64 pixels (must match the SVM training set size!!) over the whole area [380:600,0:1280] with a distance of ??
+- than I created sliding windows of size 64x64 pixels (must match the SVM training set size!!) over the whole area [380:600,0:1280] 
 - for each window I'm searching I apply different scales in order to have a more fine-grained or rough-grained coverage of the area (see next chapter)
 - for each (scaled window) I extract the HOG-features, spatial feature and histogram features 
 - and finally feed the whole features of the 64x64 window into the SVM classifier in order to receive a result
@@ -546,6 +546,4 @@ I'm sure the second term will get to know much techniques like kalman filter and
 Really looking forward to term 2 and I'm really happy to be part of this Udacity Nanodegress program- lot's of fun learning new stuff and somehow also proud of the results I achieved in the different projects!!
 
 
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
 

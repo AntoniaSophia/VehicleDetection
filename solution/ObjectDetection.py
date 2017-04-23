@@ -5,7 +5,7 @@ import pickle
 import cv2
 from Helper_Functions import *
 from Object import *
-from peakdetect import *
+
 from ColorThief import ColorThief
 import glob
 import itertools
@@ -175,15 +175,14 @@ class ObjectDetection():
                 subimg = cv2.resize(
                     ctrans_tosearch[ytop:ytop+window, xleft:xleft+window], (64, 64))
 
+                #cv2.rectangle(draw_img,(xleft,ystart+ytop),(xleft+window,ystart+ytop+window),(0,0,255),6)
+                #plt.imshow(draw_img)
+
                 # Get color features
                 spatial_features = bin_spatial(subimg, size=spatial_size)
                 hist_features = color_hist(subimg, nbins=hist_bins)
 
-                #print(spatial_features.shape)
-                #print(hist_features.shape) 
-                #print(hog_features.shape) 
                 # Scale features and make a prediction
-
                 test_features = X_scaler.transform(
                     np.hstack((spatial_features, hist_features, hog_features)).reshape(1, -1))
                 #test_features = X_scaler.transform(np.hstack((shape_feat, hist_feat)).reshape(1, -1))
@@ -194,10 +193,12 @@ class ObjectDetection():
                     xbox_left = np.int(xleft*scale)
                     ytop_draw = np.int(ytop*scale)
                     win_draw = np.int(window*scale)
-                    #cv2.rectangle(draw_img,(xbox_left, ytop_draw+ystart),(xbox_left+win_draw,ytop_draw+win_draw+ystart),draw_color,6)
+                    cv2.rectangle(draw_img,(xbox_left, ytop_draw+ystart),(xbox_left+win_draw,ytop_draw+win_draw+ystart),(0,0,255),6)
                     find_rectangles.append(
                         ((xbox_left, ytop_draw+ystart), (xbox_left+win_draw, ytop_draw+win_draw+ystart)))
-                    # print(find_rectangles)
+
+        #plt.imshow(draw_img)
+        #plt.show()
         return find_rectangles
 
     # process the next frame
@@ -289,27 +290,27 @@ class ObjectDetection():
         # #################################
 
         # #################################
-        temp_vehicle_boxes = []
-        draw_color = (0,0,255) 
-        scale = 0.6
-        result_list = self.find_cars(img, ystart, ystop, scale, self.svc, self.X_scaler, self.orient, self.pix_per_cell,
-                           self.cell_per_block, self.spatial_size, self.hist_bins)
+        #temp_vehicle_boxes = []
+        #draw_color = (0,0,255) 
+        #scale = 0.6
+        #result_list = self.find_cars(img, ystart, ystop, scale, self.svc, self.X_scaler, self.orient, self.pix_per_cell,
+        #                   self.cell_per_block, self.spatial_size, self.hist_bins)
 
-        temp_vehicle_boxes = append_boxes(temp_vehicle_boxes,result_list)
-        out_img = draw_boxes(out_img, temp_vehicle_boxes, color=draw_color, thick=6)
-        vehicle_boxes = append_boxes(vehicle_boxes , temp_vehicle_boxes)
+        #temp_vehicle_boxes = append_boxes(temp_vehicle_boxes,result_list)
+        #out_img = draw_boxes(out_img, temp_vehicle_boxes, color=draw_color, thick=6)
+        #vehicle_boxes = append_boxes(vehicle_boxes , temp_vehicle_boxes)
         # #################################
 
         # #################################
-        temp_vehicle_boxes = []
-        draw_color = (0,0,255) 
-        scale = 0.4
-        result_list = self.find_cars(img, ystart, ystop, scale, self.svc, self.X_scaler, self.orient, self.pix_per_cell,
-                           self.cell_per_block, self.spatial_size, self.hist_bins)
+        #temp_vehicle_boxes = []
+        #draw_color = (0,0,255) 
+        #scale = 0.4
+        #result_list = self.find_cars(img, ystart, ystop, scale, self.svc, self.X_scaler, self.orient, self.pix_per_cell,
+        #                   self.cell_per_block, self.spatial_size, self.hist_bins)
 
-        temp_vehicle_boxes = append_boxes(temp_vehicle_boxes,result_list)
-        out_img = draw_boxes(out_img, temp_vehicle_boxes, color=draw_color, thick=6)
-        vehicle_boxes = append_boxes(vehicle_boxes , temp_vehicle_boxes)
+        #temp_vehicle_boxes = append_boxes(temp_vehicle_boxes,result_list)
+        #out_img = draw_boxes(out_img, temp_vehicle_boxes, color=draw_color, thick=6)
+        #vehicle_boxes = append_boxes(vehicle_boxes , temp_vehicle_boxes)
         # #################################
 
 
@@ -317,14 +318,31 @@ class ObjectDetection():
         heat = np.zeros_like(img[:, :, 0]).astype(np.float)
         heat = add_heat(heat, vehicle_boxes)
         heatmap = np.clip(heat, 0, 255)
-        heatmap = apply_threshold(heatmap, 10)
+        heatmap = apply_threshold(heatmap, 5)
+
+        #plt.imshow(img)
+        #plt.show()
+
+        #plt.imshow(heatmap, cmap='gist_heat')
+        #plt.show()
+
+
 
         # 4.Step:  Find final boxes from heatmap using label function
         labels = label(heatmap)
         print(labels[1], 'cars found')
+        #img_labeled = draw_labeled_bboxes(img,labels)
+        #plt.imshow(labels[0], cmap='gray')
+        #plt.show()
 
         # 5. Step: extract the "raw objects" from all objects that have been found according to the heatmap
         foundObjects = create_Objects_from_Labels(labels,frameCounter)
+        img_ann = np.copy(img)
+        img_ann = draw_objects(np.copy(img),foundObjects)
+        #plt.imshow(img_ann)
+        #plt.show()
+
+
 
         # 6.Step: now apply object plausibilization and object tracking to all "raw objects"
         for object_number in range(0, len(foundObjects)):

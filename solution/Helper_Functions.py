@@ -269,6 +269,7 @@ def draw_objects(img, objects):
         bbox = ((objects[object_number].get_Left_Upper_x_smoothing(), objects[object_number].get_Left_Upper_y_smoothing()),
                 (objects[object_number].get_Right_Lower_x_smoothing(), objects[object_number].get_Right_Lower_y_smoothing()))
         # Draw the box on the image
+        #if True == True:
         if objects[object_number].detected == True or objects[object_number].gracePeriod == True:
             print("Drawing object: ",objects[object_number].getInfo())
             cv2.rectangle(img, bbox[0], bbox[1], (0, 255, 255), 6)

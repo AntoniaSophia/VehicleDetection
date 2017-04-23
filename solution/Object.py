@@ -213,7 +213,7 @@ class Object():
             returnValue = int(value/len(self.objectHistory))
             #print("Returning " , returnValue , " instead of " , self.right_lower_x)
             return returnValue
-        return self.relativeDistance
+        return self.right_lower_x
 
 
     # return the right_lower_y coordinate in a smoothened way

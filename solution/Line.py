@@ -889,11 +889,11 @@ def videotest():
     testFrame.initializeCamera()
 
 
-    #cap = cv2.VideoCapture('../test_videos/harder_challenge_video.mp4')
-    #out = cv2.VideoWriter('c:/temp/harder_challenge_video.avi', cv2.VideoWriter_fourcc(*'XVID'), 28.0, (1280,720))    
+    cap = cv2.VideoCapture('../test_videos/challenge_video.mp4')
+    out = cv2.VideoWriter('c:/temp/challenge_video.avi', cv2.VideoWriter_fourcc(*'XVID'), 28.0, (1280,720))    
 
-    cap = cv2.VideoCapture('../test_videos/project_video.mp4')
-    out = cv2.VideoWriter('c:/temp/project_video.mp4', cv2.VideoWriter_fourcc(*'XVID'), 24.0, (1280,720))    
+    #cap = cv2.VideoCapture('../test_videos/project_video.mp4')
+    #out = cv2.VideoWriter('c:/temp/project_video.mp4', cv2.VideoWriter_fourcc(*'XVID'), 24.0, (1280,720))    
 
     i = 0
     counter = 0 
@@ -901,7 +901,7 @@ def videotest():
         ret, frame = cap.read()
         counter += 1
 
-        #if counter < 140:
+        #if counter != 1000:
         #    continue
 
 

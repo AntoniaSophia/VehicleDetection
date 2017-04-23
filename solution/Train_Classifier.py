@@ -32,8 +32,6 @@ for image in images:
 
 print(len(cars))
 print(len(notcars))
-exit()
-
 
 
 color_space = 'YCrCb' # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
