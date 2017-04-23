@@ -26,10 +26,10 @@ The goals / steps of this project are the following:
 
 * link to Train_Classifier.py [Training for the SVM classifier](https://github.com/AntoniaSophia/VehicleDetection/blob/master/solution/Train_Classifier.py)
 * link to Calibrate_Camera.py [Calibrate the Camera](https://github.com/AntoniaSophia/CarND-Advanced-Lane-Lines/blob/master/solution/Calibrate_Camera.py)  
-* link to Jupyter monitor which shows calibration and warp calculation [Notebook](https://github.com/AntoniaSophia/CarND-Advanced-Lane-Lines/blob/master/solution/Advanced_Lane_Lines.ipynb)
-* link to HTML output of the Jupyter monitor which shows calibration and warp calculation [Notebook HTML](https://github.com/AntoniaSophia/CarND-Advanced-Lane-Lines/blob/master/output_images/Advanced_Lane_Lines.html)
-* link to the annotated output video of the project_video.mp4 at [Project video](https://github.com/AntoniaSophia/CarND-Advanced-Lane-Lines/blob/master/output_videos/project_video.mp4)
-* link to the annotated output video of the challenge_video.mp4 at [Challenge video](https://github.com/AntoniaSophia/CarND-Advanced-Lane-Lines/blob/master/output_videos/challenge_video.avi)
+* link to Jupyter monitor which shows training of the SVM classifier and heatmaps [Notebook](https://github.com/AntoniaSophia/VehicleDetection/blob/master/solution/VehicleDetection.ipynb)
+* link to HTML output of the Jupyter monitor which shows calibration and warp calculation [Notebook HTML](https://github.com/AntoniaSophia/VehicleDetection/blob/master/solution/VehicleDetection.html)
+* link to the annotated output video of the project_video.mp4 at [Project video](https://github.com/AntoniaSophia/VehicleDetection/blob/master/output_videos/project_video.mp4)
+* link to the annotated output video of the challenge_video.mp4 at [Challenge video](https://github.com/AntoniaSophia/VehicleDetection/blob/master/output_videos/challenge_video.avi)
 
 ---
 ###Writeup / README
@@ -56,11 +56,11 @@ Here is an example using the `YCrCb` color space and HOG parameters of `orientat
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and finally came out with cell 3 ...
+I tried various combinations of parameters and finally came out with the following cell 3 ...
 
 | Variable        | Value   | 
 |:-------------:|:-------------:| 
-| color_space   # Can be RGB, HSV, LUV, HLS, YUV, YCrCb     | 'YCrCb'       | 
+| color_space   →→# Can be RGB, HSV, LUV, HLS, YUV, YCrCb     | 'YCrCb'       | 
 | orient   # HOG orientations   | 9     |
 | pix_per_cell   # HOG pixels per cell     | 8      |
 | cell_per_block  # HOG cells per block    | 2      |
@@ -121,6 +121,11 @@ Here's an example result showing the heatmap from a series of frames of video, t
 ###Discussion
 
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
+
+
+Relative speed:
+- bounding box gets bigger
+- curvature not calculated
 
 Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
 
