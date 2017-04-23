@@ -297,79 +297,103 @@ Here's an example result showing the heatmap from a series of frames of video, t
 ### Here are six frames and their corresponding heatmaps:
 
 Frame 1 - original image:
+
 ![image20][image20]
 
 Frame 1 - corresponding heatmap:
+
 ![image21][image21]
 
 Frame 160 - original image:
+
 ![image30][image30]
 
 Frame 160 - corresponding heatmap:
+
 ![image31][image31] 
 
 Frame 560 - original image:
+
 ![image40][image40] 
 
 Frame 560 - corresponding heatmap:
+
 ![image41][image41] 
 
 Frame 730 - original image:
+
 ![image50][image50] 
 
 Frame 730 - corresponding heatmap:
+
 ![image51][image51] 
 
 Frame 760 - original image:
+
 ![image60][image60] 
 
 Frame 760 - corresponding heatmap:
+
 ![image61][image61] 
 
 
 Frame 1000 - original image:
+
 ![image70][image70] 
 
 Frame 1000 - corresponding heatmap:
+
 ![image71][image71] 
 
 
 ### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
 Frame 1 - labels in gray after thresholding:
+
 ![image22][image22]
 
 Frame 160 - labels in gray after thresholding:
+
 ![image32][image32]
 
 Frame 560 - labels in gray after thresholding:
+
 ![image42][image42]
 
 Frame 730 - labels in gray after thresholding:
+
 ![image52][image52]
 
 Frame 760 - labels in gray after thresholding:
+
 ![image62][image62]
 
 Frame 1000 - labels in gray after thresholding:
+
 ![image72][image72]
 
 ### Here the resulting bounding boxes are drawn onto the last frame in the series:
 Frame 1 - final boxes
+
 ![image23][image23]:
 
 Frame 160 - final boxes
+
 ![image33][image33]:
 
 Frame 560 - final boxes
+
 ![image43][image43]:
 
 Frame 730 - final boxes
+
 ![image53][image53]:
 
 Frame 760 - final boxes
+
 ![image63][image63]:
 
 Frame 1000 - final boxes
+
 ![image73][image73]:
 
 
