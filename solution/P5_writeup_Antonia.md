@@ -22,12 +22,20 @@ The goals / steps of this project are the following:
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
 ###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
+###Files Submitted & Code Quality
+
+* link to Train_Classifier.py [Training for the SVM classifier](https://github.com/AntoniaSophia/VehicleDetection/blob/master/solution/Train_Classifier.py)
+* link to Calibrate_Camera.py [Calibrate the Camera](https://github.com/AntoniaSophia/CarND-Advanced-Lane-Lines/blob/master/solution/Calibrate_Camera.py)  
+* link to Jupyter monitor which shows calibration and warp calculation [Notebook](https://github.com/AntoniaSophia/CarND-Advanced-Lane-Lines/blob/master/solution/Advanced_Lane_Lines.ipynb)
+* link to HTML output of the Jupyter monitor which shows calibration and warp calculation [Notebook HTML](https://github.com/AntoniaSophia/CarND-Advanced-Lane-Lines/blob/master/output_images/Advanced_Lane_Lines.html)
+* link to the annotated output video of the project_video.mp4 at [Project video](https://github.com/AntoniaSophia/CarND-Advanced-Lane-Lines/blob/master/output_videos/project_video.mp4)
+* link to the annotated output video of the challenge_video.mp4 at [Challenge video](https://github.com/AntoniaSophia/CarND-Advanced-Lane-Lines/blob/master/output_videos/challenge_video.avi)
+
 ---
 ###Writeup / README
 
 ####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Vehicle-Detection/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
 
-You're reading it!
 
 ###Histogram of Oriented Gradients (HOG)
 
@@ -48,7 +56,22 @@ Here is an example using the `YCrCb` color space and HOG parameters of `orientat
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+I tried various combinations of parameters and finally came out with cell 3 ...
+
+| Variable        | Value   | 
+|:-------------:|:-------------:| 
+| color_space   # Can be RGB, HSV, LUV, HLS, YUV, YCrCb     | 'YCrCb'       | 
+| orient   # HOG orientations   | 9     |
+| pix_per_cell   # HOG pixels per cell     | 8      |
+| cell_per_block  # HOG cells per block    | 2      |
+| hog_channel  # Can be 0, 1, 2, or "ALL"    | 'ALL'       |
+| spatial_size  # Spatial binning dimensions    | (16, 16)       |
+| hist_bins # Number of histogram bins      | 128        |
+| spatial_feat # Spatial features on or off     | True        |
+| hist_feat # Histogram features on or off     | True   |
+| hog_feat  # HOG features on or off    | True       |
+
+
 
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 

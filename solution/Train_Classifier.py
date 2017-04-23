@@ -46,7 +46,6 @@ hist_bins = 128    # Number of histogram bins
 spatial_feat = True # Spatial features on or off
 hist_feat = True # Histogram features on or off
 hog_feat = True # HOG features on or off
-y_start_stop = [360, None] # Min and max in y to search in slide_window()
 
 # now extracting the features from the car objects
 car_features = extract_features(cars, color_space=color_space, 
