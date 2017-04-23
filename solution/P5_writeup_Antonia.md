@@ -60,7 +60,7 @@ I tried various combinations of parameters and finally came out with the followi
 
 | Variable        | Value   | 
 |:-------------:|:-------------:| 
-| color_space \s # Can be RGB, HSV, LUV, HLS, YUV, YCrCb     | 'YCrCb'       | 
+| color_space \s\s # Can be RGB, HSV, LUV, HLS, YUV, YCrCb     | 'YCrCb'       | 
 | orient   # HOG orientations   | 9     |
 | pix_per_cell   # HOG pixels per cell     | 8      |
 | cell_per_block  # HOG cells per block    | 2      |
