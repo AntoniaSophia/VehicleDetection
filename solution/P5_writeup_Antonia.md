@@ -17,6 +17,42 @@ The goals / steps of this project are the following:
 [image5]: ./../docu/hog_example_channel_0.png
 [image6]: ./../docu/hog_example_channel_1.png
 [image7]: ./../docu/hog_example_channel_2.png
+[image8]: ./../docu/window_search_1.png
+[image9]: ./../docu/window_search_scale_0_6.png
+[image10]: ./../docu/window_search_scale_1.png
+[image11]: ./../docu/window_search_scale_2.png
+
+
+[image20]: ./../docu/frame_1_orig
+[image21]: ./../docu/frame_1_heatmap
+[image22]: ./../docu/frame_1_labels
+[image23]: ./../docu/frame_1_final_box
+
+[image30]: ./../docu/frame_160_orig
+[image31]: ./../docu/frame_160_heatmap
+[image32]: ./../docu/frame_160_labels
+[image33]: ./../docu/frame_160_final_box
+
+[image40]: ./../docu/frame_560_orig
+[image41]: ./../docu/frame_560_heatmap
+[image42]: ./../docu/frame_560_labels
+[image43]: ./../docu/frame_560_final_box
+
+[image50]: ./../docu/frame_730_orig
+[image51]: ./../docu/frame_730_heatmap
+[image52]: ./../docu/frame_730_labels
+[image53]: ./../docu/frame_730_final_box
+
+[image60]: ./../docu/frame_760_orig
+[image61]: ./../docu/frame_760_heatmap
+[image62]: ./../docu/frame_760_labels
+[image63]: ./../docu/frame_760_final_box
+
+[image70]: ./../docu/frame_1000_orig
+[image71]: ./../docu/frame_1000_heatmap
+[image72]: ./../docu/frame_1000_labels
+[image73]: ./../docu/frame_1000_final_box
+
 [video1]: ./output_videos/project_video.mp4
 
 
@@ -104,21 +140,128 @@ I tried various combinations of parameters and finally came out with the followi
 
 I trained a linear SVM using 80% training data and 20% test data (see cell ??)
 Furthermore a standard feature scaler in order to prevent some features to be valued much stronger because of different input scaling. (see cell ??)
+With this setup I reached an accuracy of 99.2% and decided not to play around any further (see cell ??) - the effect of a better result seems to be small compared to problems in the further steps like pipelining or false positive detection.
 
 ###Sliding Window Search
 
 ####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
+- I decided to search for vehicles in the y-scale [380:600] because the the road is more or less flat.
+- than I created sliding windows of size 64x64 pixels (must match the SVM training set size!!) over the whole area [380:600,0:1280] with a distance of ??
+- for each window I'm searching I apply different scales in order to have a more fine-grained or rough-grained coverage of the area (see next chapter)
+- for each (scaled window) I extract the HOG-features, spatial feature and histogram features 
+- and finally feed the whole features of the 64x64 window into the SVM classifier in order to receive a result
 
-![alt text][image3]
+
+All logic is contained in the function find_cars() in ObjectDetection.py lines 114-201
+
+```
+def find_cars(self,img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins):
+    find_rectangles = []
+
+    #img = img.astype(np.float32)/255    
+    draw_img = np.copy(img)
+
+
+    img_tosearch = img[ystart:ystop, :, :]
+    ctrans_tosearch = convert_color(img_tosearch, conv='RGB2YCrCb')
+    if scale != 1:
+        imshape = ctrans_tosearch.shape
+        ctrans_tosearch = cv2.resize(
+            ctrans_tosearch, (np.int(imshape[1]/scale), np.int(imshape[0]/scale)))
+
+    ch1 = ctrans_tosearch[:, :, 0]
+    ch2 = ctrans_tosearch[:, :, 1]
+    ch3 = ctrans_tosearch[:, :, 2]
+
+    # Define blocks and steps as above
+    nxblocks = (ch1.shape[1] // pix_per_cell)-1
+    nyblocks = (ch1.shape[0] // pix_per_cell)-1
+    nfeat_per_block = orient*cell_per_block**2
+    # 64 was the orginal sampling rate, with 8 cells and 8 pix per cell
+    window = 64
+    nblocks_per_window = (window // pix_per_cell)-1
+    #nblocks_per_window = window // pix_per_cell - cell_per_block + 1
+    #nblocks_per_window = window // pix_per_cell - cell_per_block + 1
+
+    cells_per_step = 2  # Instead of overlap, define how many cells to step
+    nxsteps = (nxblocks - nblocks_per_window) // cells_per_step
+    nysteps = (nyblocks - nblocks_per_window) // cells_per_step
+
+    # Compute individual channel HOG features for the entire image
+    hog1 = get_hog_features(ch1, orient, pix_per_cell,
+                            cell_per_block, feature_vec=False)
+    hog2 = get_hog_features(ch2, orient, pix_per_cell,
+                            cell_per_block, feature_vec=False)
+    hog3 = get_hog_features(ch3, orient, pix_per_cell,
+                            cell_per_block, feature_vec=False)
+
+    for xb in range(nxsteps):
+        for yb in range(nysteps):
+
+            ypos = yb*cells_per_step
+            xpos = xb*cells_per_step
+
+            # Extract HOG for this patch
+            hog_feat1 = hog1[ypos:ypos+nblocks_per_window,
+                             xpos:xpos+nblocks_per_window].ravel()
+            hog_feat2 = hog2[ypos:ypos+nblocks_per_window,
+                             xpos:xpos+nblocks_per_window].ravel()
+            hog_feat3 = hog3[ypos:ypos+nblocks_per_window,
+                             xpos:xpos+nblocks_per_window].ravel()
+            hog_features = np.hstack((hog_feat1, hog_feat2, hog_feat3))
+
+            xleft = xpos*pix_per_cell
+            ytop = ypos*pix_per_cell
+
+            # Extract the 64x64 image patch
+            subimg = cv2.resize(
+                ctrans_tosearch[ytop:ytop+window, xleft:xleft+window], (64, 64))
+
+            # Get color features
+            spatial_features = bin_spatial(subimg, size=spatial_size)
+            hist_features = color_hist(subimg, nbins=hist_bins)
+
+            #print(spatial_features.shape)
+            #print(hist_features.shape) 
+            #print(hog_features.shape) 
+            # Scale features and make a prediction
+
+            test_features = X_scaler.transform(
+                np.hstack((spatial_features, hist_features, hog_features)).reshape(1, -1))
+            #test_features = X_scaler.transform(np.hstack((shape_feat, hist_feat)).reshape(1, -1))
+            test_prediction = svc.predict(test_features)
+            # print(test_prediction)
+
+            if test_prediction == 1:
+                xbox_left = np.int(xleft*scale)
+                ytop_draw = np.int(ytop*scale)
+                win_draw = np.int(window*scale)
+                #cv2.rectangle(draw_img,(xbox_left, ytop_draw+ystart),(xbox_left+win_draw,ytop_draw+win_draw+ystart),draw_color,6)
+                find_rectangles.append(
+                    ((xbox_left, ytop_draw+ystart), (xbox_left+win_draw, ytop_draw+win_draw+ystart)))
+                # print(find_rectangles)
+    return find_rectangles
+```
+
+
+Here are some pictures which show this window coverage of the searching area
+![window search][image8]
+
 
 ####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
 Ultimately I searched on 8 scales (1.0 , 1.3, 1.5, 1.7, 2, 0.8, 0.6, 0.4) using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
 
+Scale 1.0
+![Window Search Scale 1][image10]
 
-![alt text][image4]
+Scale 2.0
+![Window Search Scale 2][image11]
+
+Scale 0.6
+![Window Search Scale 0.6][image9]
+
 
 The corresponding code for the vehicle detection pipeline can be found in the script ObjectDetection.py in lines 204-376 of function:
 ```
@@ -153,15 +296,62 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 ### Here are six frames and their corresponding heatmaps:
 
+Frame 1 - original image
+
+![image20][image20]
 
 
-![alt text][image5]
+Frame 1 - corresponding heatmap
+
+![image21][image21]
+
+
+Frame 160 - original image
+
+![image30][image30]
+
+
+Frame 160 - corresponding heatmap
+
+![image31][image31] 
+
+Frame 560 - original image
+
+![image40][image40] 
+
+Frame 560 - corresponding heatmap
+
+![image41][image41] 
+
+
+
+[image50]: ./../docu/frame_730_orig
+[image51]: ./../docu/frame_730_heatmap
+[image52]: ./../docu/frame_730_labels
+
+[image60]: ./../docu/frame_760_orig
+[image61]: ./../docu/frame_760_heatmap
+
+[image70]: ./../docu/frame_1000_orig
+[image71]: ./../docu/frame_1000_heatmap
+
 
 ### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
+![image22][image22]
+![image32][image32]
+![image42][image42]
+![image52][image52]
+![image62][image62]
+![image72][image72]
 
 ### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
+![image23][image23]
+![image33][image33]
+![image43][image43]
+![image53][image53]
+![image63][image63]
+![image73][image73]
+
 
 
 More steps for removal of false positives can be found in the next chapter "Object Tracking"
@@ -292,7 +482,8 @@ The object tracking was relatively simple, I felt it was just straight forward p
 I'm sure my pipeline will have problems in the follwoing situations:
 - videos which contain a lot of shadows (shadow has not been tested at all)
 - night images have not been provided in the training set at all (training on white or red lights in the image which could be origined from a car)
-- only cars can be detected, no trucks or bikes,....
+- only cars can be detected, no trucks or bikes,.... (I would need more training data for the SVM classifier)
+- due to the fixed search for windows in the y-scale area [380:600] my pipeline will also not work for mountainous roads
 - my object tracking is adjusted most likely to slow moving objects as 
 - the performance of my pipepline is bad because I have used so many scales (1.0 , 1.3, 1.5, 1.7, 2, 0.8, 0.6, 0.4) - definitely should be made much faster!!
 
