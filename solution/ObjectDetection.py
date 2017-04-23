@@ -85,6 +85,9 @@ class ObjectDetection():
 
                 tempObject.mergeObject(newObject,self.M)
 
+                # only merge one object (to the first matching object!) and not too all objects
+                continue
+
 
         # 4.Step: if no overlap match has been found --> append this object as newly found object
         if existingObjectFound == False:
@@ -349,21 +352,12 @@ class ObjectDetection():
                 # process img_tosearch....
                 cv2.imwrite('c:/temp/image_colorthief.png',img_tosearch)
                 color_thief = ColorThief('c:/temp/image_colorthief.png')
-                # get the dominant color
-                #dominant_color = color_thief.get_color(quality=1)
+                # get the two favorite colors
                 palette = color_thief.get_palette(color_count=2)
-                #print("Palette = " , palette[0])
                 actual_name, closest_name = get_color_name(palette[0])
                 foundObjects[object_number].color = closest_name
-                #print("Dominant color = " , palette[0])
-                #print("Color Name = " , actual_name)
-                #print("closest_name  = " , closest_name)
-                #del palette
-                #warped2 = cv2.warpPerspective(point, self.M, (1,2),flags=cv2.INTER_LINEAR)
 
-                # 10.Step calculate the relative distance of the object
-
-                # 12. Test: in case the threshold value of 0.4 has been passed --> call object tracking function
+                # 10.Step Test: in case the threshold value of 0.4 has been passed --> call object tracking function
                 self.track_object(self.objectsDetected , foundObjects[object_number])
 
 

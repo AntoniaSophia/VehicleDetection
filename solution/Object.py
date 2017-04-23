@@ -84,7 +84,7 @@ class Object():
         # no mercy !! reduce the occurance counter
         self.numberOfOccurances-=1
 
-        #in case we have more than 5 historic object data just remove the latest one
+        #in case we have more than historyLength historic object data just remove the latest one
         if len(self.objectHistory) >= self.historyLength:
             self.objectHistory.pop(0)
 
@@ -111,7 +111,6 @@ class Object():
             #self.frameCounter = objectToMerge.frameCounter
             #self.objectNumber = objectToMerge.objectNumber
 
-            #self.relativeDistance = objectToMerge.relativeDistance
             #3.Step: get the middle of the bottom line of the bounding box and warp this point
             pos = np.array((self.get_Left_Upper_x_smoothing() + 
                 (self.get_Right_Lower_x_smoothing()-self.get_Left_Upper_x_smoothing())/2,self.get_Right_Lower_y_smoothing()),dtype="float32").reshape(1, 1, -1)
