@@ -36,7 +36,7 @@ The goals / steps of this project are the following:
 [image40]: ./../docu/frame_560_orig.png
 [image41]: ./../docu/frame_560_heatmap.png
 [image42]: ./../docu/frame_560_labels.png
-[image43]: ./../docu/frame_560__final_box.png
+[image43]: ./../docu/frame_560_final_box.png
 
 [image50]: ./../docu/frame_730_orig.png
 [image51]: ./../docu/frame_730_heatmap.png
