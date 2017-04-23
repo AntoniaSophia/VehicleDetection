@@ -138,7 +138,7 @@ I tried various combinations of parameters and finally came out with the followi
 
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using 80% training data and 20% test data (see cell 16)
+I trained a linear SVM using 80% training data and 20% test data (see cell 16 of the Jupyter notebook [Notebook](https://github.com/AntoniaSophia/VehicleDetection/blob/master/solution/VehicleDetection.ipynb))
 Furthermore a standard feature scaler in order to prevent some features to be valued much stronger because of different input scaling. (see cell 16)
 With this setup I reached an accuracy of 99.05% and decided not to play around any further (see cell 19) - the effect of a better result seems to be small compared to problems in the further steps like pipelining or false positive detection.
 
