@@ -44,29 +44,35 @@ The code for this step is contained in the first code cell of the IPython notebo
 I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
 
 Car example
+
 ![car example][image1]
 
 Non-Car example
+
 ![non-car example][image2]
 
 I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
+
 ![HOG example orig][image3]
 
 The same image converted into color space `YCrCb`
+
 ![HOG converted to `YCrCb`][image4]
 
 Now the HOG channel 0 from this image
+
 ![HOG channel 2][image5]
 
 Now the HOG channel 1 from this image
+
 ![HOG channel 1][image6]
 
 Now the HOG channel 2 from this image
+
 ![HOG channel 2][image7]
 
-Using this color space `YCrCb` gives much better deviations in the HOG channels than other color spaces as I found out. Differences in the above examples are clearly visible. Thus I decided to go for this color space using all HOG channels for feature extraction
-
+Using this color space `YCrCb` gives much better deviations in the HOG channels than other color spaces as I found out. Differences in the above examples are clearly visible. Thus I decided to go for this color space using all HOG channels for feature extraction.
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
