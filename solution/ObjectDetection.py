@@ -10,7 +10,6 @@ from ColorThief import ColorThief
 import glob
 import itertools
 from scipy.ndimage.measurements import label
-from scipy import signal
 
 # ObjectDetection is the main class which executes the frame processing and searching for objects
 class ObjectDetection():
@@ -60,8 +59,12 @@ class ObjectDetection():
 
     # initialize all detected objects before a next frame is processed - this is an essential part of object tracking!!
     def initNextFrame(self):
+        #do a cleanup of ghost objects from time to time
+        self.objectsDetected = self.cleanup_objects(self.objectsDetected)
+
         for object_number in range(0, len(self.objectsDetected)):
             self.objectsDetected[object_number].initNextFrame()
+
 
     # track an object - this is the heart function of object tracking!!
     # assume newObject as the newly found object in a frame
@@ -76,10 +79,12 @@ class ObjectDetection():
             overlap = tempObject.getOverlapVolume(newObject)
             #print("Overlap " , newObject.getInfo() , "  with existing " + tempObject.getInfo() , " : " , overlap)
 
-            # 3.Step: In case the overlap > 1000 than assume both objects are same and merge both objects
-            if  overlap > 1000:
-                existingObjectFound = True            
-                tempObject.mergeObject(newObject)
+            # 3.Step: In case the overlap > 500 than assume both objects are same and merge both objects
+            if  overlap > 500:
+                existingObjectFound = True  
+
+                tempObject.mergeObject(newObject,self.M)
+
 
         # 4.Step: if no overlap match has been found --> append this object as newly found object
         if existingObjectFound == False:
@@ -89,17 +94,14 @@ class ObjectDetection():
         return allObjects
 
     # clean up rubbish objects that that no not appeared since the last 72 frames
-    def cleanup_objects(self,allObjects,counter):
+    def cleanup_objects(self,allObjects):
         result = []
         for object_number in range(0, len(allObjects)):
             tempObject = allObjects[object_number]
 
-            if (counter - tempObject.frameCounter) > 72:
-                if tempObject.detected == False and tempObject.gracePeriod == False:
-                    # remove this object
-                    print()
-                else:
-                    result.append(tempObject)      
+            if tempObject.detected == False and tempObject.gracePeriod == False and tempObject.numberOfOccurances < -3:
+                # remove this object
+                continue
             else:
                 result.append(tempObject)      
 
@@ -360,22 +362,6 @@ class ObjectDetection():
                 #warped2 = cv2.warpPerspective(point, self.M, (1,2),flags=cv2.INTER_LINEAR)
 
                 # 10.Step calculate the relative distance of the object
-                pos = np.array((foundObjects[object_number].left_upper_x + 
-                    (foundObjects[object_number].right_lower_x-foundObjects[object_number].left_upper_x)/2,foundObjects[object_number].right_lower_y),dtype="float32").reshape(1, 1, -1)
-                reference_warped = np.array((720,640),dtype="float32").reshape(1, 1, -1)
-                #print("Pos: " ,pos)
-
-                dst1 = cv2.perspectiveTransform(pos, self.M).reshape(-1, 1)
-                dst_warped = cv2.perspectiveTransform(reference_warped, self.M).reshape(-1, 1)
-                #print(dst1)
-                #print(dst_warped)                
-                ym_per_pix = 30/720
-                distance = round(((dst_warped[1]-dst1[1])*ym_per_pix)[0],2)
-                #print(distance)
-                foundObjects[object_number].relativeDistance = distance
-
-                # 11.Step calculate the relative speed of the object
-                # process img_tosearch....
 
                 # 12. Test: in case the threshold value of 0.4 has been passed --> call object tracking function
                 self.track_object(self.objectsDetected , foundObjects[object_number])
@@ -385,15 +371,12 @@ class ObjectDetection():
         print("Length All: " , len(self.objectsDetected))
 
 
-        # 11.Step: do a cleanup of ghost objects from time to time
-        if frameCounter%100 == 0:
-            self.objectsDetected = self.cleanup_objects(self.objectsDetected,frameCounter)
 
         # save the image in a folder for debugging purposes
         if saveFrame==True:
-            draw_img = draw_objects(np.copy(img), self.objectsDetected)
-            mpimg.imsave('./../output/img_' + str(counter) + '.png', draw_img)
-
+            #draw_img = draw_objects(np.copy(img), self.objectsDetected)
+            #mpimg.imsave('./../output/img_' + str(counter) + '.png', draw_img)
+            print()
 
 
         return self.objectsDetected

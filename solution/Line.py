@@ -738,7 +738,7 @@ class Frame():
             #2.Step: draw the pipelined image on top of currentImage
             result = cv2.addWeighted(self.currentImg.astype(int), 1, img_pipelined.astype(int), 0.5, 0,dtype=cv2.CV_8U)
 
-            #3.Step: Draw the object boxes
+            #3.Step: Draw the object boxes from vehicle detection
             result = draw_objects(result, self.objectDetection.objectsDetected)
             
             return result
@@ -901,8 +901,8 @@ def videotest():
         ret, frame = cap.read()
         counter += 1
 
-        if counter < 1000:
-            continue
+        #if counter < 140:
+        #    continue
 
 
         # check for corrupted frames and drop them if necessary
@@ -927,7 +927,8 @@ def videotest():
         testFrame.processCurrentFrame(counter)
         
         # and store the resulting annotated overlay frame 
-        #out.write(testFrame.getOverlayImage())
+        overlay = testFrame.getOverlayImage()
+        out.write(overlay)
 
 
         # save single frames on left button click for debugging purposes
@@ -938,7 +939,7 @@ def videotest():
             #print("Toggle activated")
             i = i + 1
             #cv2.imwrite('../temp_images/img_temp_' + str(i) + '.png', frame)
-            cv2.imwrite('../temp_images_1/img_overlay_' + str(i) + '.png', testFrame.getOverlayImage())
+            cv2.imwrite('../temp_images_1/img_overlay_' + str(i) + '.png', overlay)
 
         else:
             #print("Toggle deactivated")

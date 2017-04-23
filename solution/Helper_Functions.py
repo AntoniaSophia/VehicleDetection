@@ -270,20 +270,19 @@ def draw_objects(img, objects):
                 (objects[object_number].get_Right_Lower_x_smoothing(), objects[object_number].get_Right_Lower_y_smoothing()))
         # Draw the box on the image
         if objects[object_number].detected == True or objects[object_number].gracePeriod == True:
-        #if True == True:
-            #print("Really Drawing: ",objects[object_number].getInfo())
-            cv2.rectangle(img, bbox[0], bbox[1], (0, 0, 255), 6)
+            print("Drawing object: ",objects[object_number].getInfo())
+            cv2.rectangle(img, bbox[0], bbox[1], (0, 255, 255), 6)
 
             text1 = "Vehicle: " + objects[object_number].getID()
             text2 = "Color: " + objects[object_number].getColor()
-            text3 = "Rel. distance: " + str(objects[object_number].getRelDistance()) + " (m)"
-            text4 = "Rel. speed: " + str(objects[object_number].getRelSpeed())
-            cv2.putText(img,text1,(bbox[0][0],bbox[0][1]-80), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
-            cv2.putText(img,text2,(bbox[0][0],bbox[0][1]-60), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
-            cv2.putText(img,text3,(bbox[0][0],bbox[0][1]-40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
-            cv2.putText(img,text4,(bbox[0][0],bbox[0][1]-20), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1,cv2.LINE_AA)
-    # Return the image
+            text3 = "Rel. distance: " + str(objects[object_number].get_RelDistance_smoothing()) + " (m)"
+            text4 = "Rel. speed: " + str(objects[object_number].getRelSpeed()) + " (km/h)"
+            cv2.putText(img,text1,(bbox[0][0],bbox[0][1]-80), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,255,255),1,cv2.LINE_AA)
+            cv2.putText(img,text2,(bbox[0][0],bbox[0][1]-60), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,255,255),1,cv2.LINE_AA)
+            cv2.putText(img,text3,(bbox[0][0],bbox[0][1]-40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,255,255),1,cv2.LINE_AA)
+            cv2.putText(img,text4,(bbox[0][0],bbox[0][1]-20), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,255,255),1,cv2.LINE_AA)
 
+    # Return the image
     return img
 
 # Create objects from labels

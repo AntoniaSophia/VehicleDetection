@@ -1,3 +1,7 @@
+import numpy as np
+import cv2
+
+
 # Objects that can be detected 
 # actually this could be different kinds of objects like cars, trucks, bikes,... 
 # but only a general class is currently being implemented
@@ -21,6 +25,8 @@ class Object():
 
         self.color = ""
         self.relativeDistance = -1
+        self.relativeSpeed = -1
+        self.historyLength = 12
 
     # set the location of the object (all 4 coordinates of the bounding boxes)
     def setLocation(self,l_upper_y , l_upper_x , r_lower_y, r_lower_x):
@@ -76,54 +82,78 @@ class Object():
         self.detected = False
 
         # no mercy !! reduce the occurance counter
-        if self.numberOfOccurances >0: 
-            self.numberOfOccurances-=1
+        self.numberOfOccurances-=1
 
-            #in case we have more than 5 historic object data just remove the latest one
-            if len(self.objectHistory) >= 5:
-                self.objectHistory.pop(0)
+        #in case we have more than 5 historic object data just remove the latest one
+        if len(self.objectHistory) >= self.historyLength:
+            self.objectHistory.pop(0)
 
         # ok, some mercy......in case an object has been detected subsequentally over 24 frames it gets some mercy.....
         # else remove the mercy.....
         if self.numberOfOccurances < 24:
             self.gracePeriod = False
 
+        #print("Number of occurance counter: " , self.numberOfOccurances)
 
 
     # this is also an essential part of object tracking: merge two identical objects
-    def mergeObject(self,objectToMerge):
-        # only merge in case the new object has a higher frame counter
+    def mergeObject(self,objectToMerge,M):
+        #1.Step: only merge in case the new object has a higher frame counter
         if self.frameCounter < objectToMerge.frameCounter:
-            #self.frameCounter = objectToMerge.frameCounter
-            #self.objectNumber = objectToMerge.objectNumber
 
-            # don't copy the object - but update the existing object!!
+            #2.Step don't copy the object - but update the existing object!!
             self.left_upper_y = objectToMerge.left_upper_y
             self.left_upper_x = objectToMerge.left_upper_x
             self.right_lower_y = objectToMerge.right_lower_y
             self.right_lower_x = objectToMerge.right_lower_x
 
-            self.relativeDistance = objectToMerge.relativeDistance
+            # don't merge frameCounter or objectNumber as this would create "new" objects !!!
+            #self.frameCounter = objectToMerge.frameCounter
+            #self.objectNumber = objectToMerge.objectNumber
 
-        # increase the occurence counter
+            #self.relativeDistance = objectToMerge.relativeDistance
+            #3.Step: get the middle of the bottom line of the bounding box and warp this point
+            pos = np.array((self.get_Left_Upper_x_smoothing() + 
+                (self.get_Right_Lower_x_smoothing()-self.get_Left_Upper_x_smoothing())/2,self.get_Right_Lower_y_smoothing()),dtype="float32").reshape(1, 1, -1)
+            dst1 = cv2.perspectiveTransform(pos, M).reshape(-1, 1)
+
+            #4.Step: get the middle of the image bottom (image is 720x1280) and warp this point
+            reference_warped = np.array((720,640),dtype="float32").reshape(1, 1, -1)
+            dst_warped = cv2.perspectiveTransform(reference_warped, M).reshape(-1, 1)
+
+            #5.Step: calculate the pixel distance of both points and calculate the y distance in meter space , 1 pixel ~ 30/720 meters
+            ym_per_pix = 30/720
+            distance = round(((dst_warped[1]-dst1[1])*ym_per_pix)[0],2)
+            self.relativeDistance = distance
+
+
+            # 6.Step calculate the relative speed of the object
+            if len(self.objectHistory) == self.historyLength-1:     #we have no appended this object yet --> so subtract 1 from historyLength
+                delta_s = (self.get_RelDistance_smoothing() - self.objectHistory[0].get_RelDistance_smoothing())    #difference in relative distance
+                delta_t = self.historyLength/24         # difference in delta time, assuming 24 frames per second (attention: 24fps is hardcoded here!!)
+                relativeSpeed = round((delta_s/delta_t)*3.6,2)      #relative speed is just delta distance / delta time * 3.6 (3.6 is factor to convert from m/s to km/h)
+                self.relativeSpeed = relativeSpeed
+                #print("#####################Relative Speed: " , relativeSpeed)
+
+
+        #7.Step: increase the occurence counter
         self.numberOfOccurances+=2
 
-        # ok, some mercy......in case an object has been detected subsequentally over 24 frames it gets some mercy.....
+        #8.Step: ok, distribute some mercy......in case an object has been detected subsequentally over 24 frames it gets some mercy.....
         if self.numberOfOccurances > 24:
             self.gracePeriod = True
             # limit the occurence counter to 30
             self.numberOfOccurances = 30
 
 
-        #threshold of the minimal number of subsequent occurences of an object before it is confirmed as existing
+        #9.Step: threshold of the minimal number of subsequent occurences of an object before it is confirmed as existing
         if self.numberOfOccurances >= self.detectionThreshold:
             #print("Setting object to detected " ,self.getInfo())  
             self.detected = True
 
-        # finally append the object to the object history......
+        #10.Step: finally append the object clone to the object history......
         self.objectHistory.append(self.clone())
 
-        #print("Number of occurences = " ,self.numberOfOccurances)  
         return 
 
 
@@ -181,11 +211,10 @@ class Object():
             value = 0
             for nr in range(0, len(self.objectHistory)):            
                 value += self.objectHistory[nr].right_lower_x
-
             returnValue = int(value/len(self.objectHistory))
             #print("Returning " , returnValue , " instead of " , self.right_lower_x)
             return returnValue
-        return self.right_lower_x
+        return self.relativeDistance
 
 
     # return the right_lower_y coordinate in a smoothened way
@@ -199,6 +228,18 @@ class Object():
             #print("Returning " , returnValue , " instead of " , self.right_lower_y)
             return returnValue
         return self.right_lower_y
+
+    # return the right_lower_y coordinate in a smoothened way
+    def get_RelDistance_smoothing(self):
+        if len(self.objectHistory)>0:
+            value = 0
+            for nr in range(0, len(self.objectHistory)):            
+                value += self.objectHistory[nr].relativeDistance
+
+            returnValue = round(value/len(self.objectHistory),2)
+            print("Returning " , returnValue , " instead of " , self.relativeDistance)
+            return returnValue
+        return self.relativeDistance
 
     # clone an object
     def clone(self):
@@ -215,6 +256,7 @@ class Object():
         returnObject.detectionThreshold = self.detectionThreshold
         returnObject.color = self.color
         returnObject.relativeDistance = self.relativeDistance
+        returnObject.relativeSpeed = self.relativeSpeed
 
         return returnObject        
  
@@ -228,4 +270,4 @@ class Object():
 
     # return the relative speed of an object to the ego vehicle
     def getRelSpeed(self):
-        return -1                
+        return self.relativeSpeed                
